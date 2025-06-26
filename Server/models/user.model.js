@@ -26,6 +26,43 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: ""
         },
+        bodyType: {
+            type: String,
+            default: ""
+        },
+        goals: {
+            type: [String],
+            default: []
+        },
+        gender: {
+            type: String,
+            default: ""
+        },
+        ageRange: {
+            type: String,
+            default: ""
+        },
+        minAge: {
+            type: Number,
+            default: ""
+        },
+        maxAge: {
+            type: Number,
+            default: ""
+        },
+        preferredClothingStyle: {
+            type: [String],
+            default: []
+        },
+        favColor: {
+            type: [String],
+            default: []
+        },
+        fitType: {
+            type: "String",
+            default: ""
+        },
+
         isVerified: {
             type: Boolean,
             default: false

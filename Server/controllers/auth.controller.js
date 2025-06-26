@@ -241,3 +241,43 @@ export const saveUserImage = async (req, res) => {
 
     }
 }
+
+export const saveOnboardData = async (req, res) => {
+    try {
+
+        const { image, bodyType, goals, gender, ageRange, preferredClothingStyle, favColor, fitType } = req.body;
+        const userId = req.userId;
+        if (!image) {
+            res.status(400).json({ success: false, message: "Profile Pic is required" })
+        }
+        const response = await cloudinary.uploader.upload(image);
+
+        const normalizedRange = ageRange.replace(/[–-]/, '-');
+        const [minAge, maxAge] = normalizedRange.split('-').map(Number);
+
+        const updateUser = await User.findByIdAndUpdate(userId, {
+            userImage: response.secure_url,
+            bodyType,
+            goals,
+            gender,
+            ageRange,
+            minAge: minAge,
+            maxAge: maxAge,
+            preferredClothingStyle,
+            favColor,
+            fitType
+        }, { new: true })
+
+        return res.status(200).json({
+            success: true,
+            message: "Onboarding data saved successfully",
+            user: updateUser
+        });
+
+
+    } catch (error) {
+        console.log("Error in saveOnboardData", error);
+        res.status(500).json("Internal Server Error")
+    }
+
+}

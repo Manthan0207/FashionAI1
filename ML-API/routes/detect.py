@@ -5,8 +5,8 @@ router = APIRouter()
 
 @router.post("/detect")
 async def detect(file: UploadFile = File(...)):
+    print("hi1")
     if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Invalid file type")
-    
-    result = detect_faces_and_bodies(file)
-    return result
+        raise HTTPException(400, "Invalid file type")
+    print("hi2")
+    return detect_faces_and_bodies(file)

@@ -22,7 +22,7 @@ app.use(cors({
     credentials: true //to send cookies in the request from frontend
 }))
 
-app.use(express.json()) //allows us to parse incoming requests : req.body
+app.use(express.json({ limit: "10mb" })) //allows us to parse incoming requests : req.body
 app.use(cookieParser()) //this will allow us to parse incoming cookies(to use cookies in req obj)
 
 app.use("/api/auth", authRoutes)

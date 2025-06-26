@@ -112,6 +112,78 @@ function ProductDetailPage() {
             ],
             inStock: true,
             stockCount: 8
+        },
+        {
+            id: 4,
+            name: "Vintage Denim Jacket",
+            price: "$79.99",
+            originalPrice: "$95.00",
+            images: [
+                "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=600&h=800&fit=crop",
+                "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"
+            ],
+            rating: 4.7,
+            reviews: 156,
+            category: "Jackets",
+            isNew: false,
+            isTrending: true,
+            description: "Classic vintage denim jacket featuring a slightly faded look, metal button closures, and interior pocket detailing. Designed for comfort and cool weather.",
+            features: ["Durable denim", "Button-up front", "Interior & exterior pockets", "Washed vintage look", "Breathable cotton lining"],
+            sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+            colors: [
+                { name: 'Vintage Blue', value: 'default', hex: '#3A5A80' },
+                { name: 'Washed Grey', value: 'grey', hex: '#696969' }
+            ],
+            inStock: true,
+            stockCount: 21
+        },
+        {
+            id: 5,
+            name: "Minimalist White Tee",
+            price: "$24.99",
+            originalPrice: "$32.00",
+            images: [
+                "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&h=800&fit=crop",
+                "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop"
+            ],
+            rating: 4.5,
+            reviews: 78,
+            category: "T-Shirts",
+            isNew: false,
+            isTrending: false,
+            description: "Crisp, clean-cut white tee designed for those who love simplicity. Features a slim fit and soft texture ideal for layering or wearing solo.",
+            features: ["Breathable cotton blend", "Slim-fit design", "Tag-free neckline", "Machine washable", "Eco-friendly dyes"],
+            sizes: ['XS', 'S', 'M', 'L', 'XL'],
+            colors: [
+                { name: 'White', value: 'default', hex: '#FFFFFF' },
+                { name: 'Charcoal', value: 'charcoal', hex: '#333333' }
+            ],
+            inStock: true,
+            stockCount: 50
+        },
+        {
+            id: 6,
+            name: "Floral Maxi Dress",
+            price: "$119.99",
+            originalPrice: "$150.00",
+            images: [
+                "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600&h=800&fit=crop",
+                "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=800&fit=crop"
+            ],
+            rating: 4.8,
+            reviews: 167,
+            category: "Dresses",
+            isNew: true,
+            isTrending: false,
+            description: "Flowy and vibrant, this floral maxi dress is perfect for summer evenings and special occasions. Designed with adjustable straps and a high slit.",
+            features: ["Floral print", "Adjustable straps", "Soft flowing fabric", "High side slit", "Hidden back zipper"],
+            sizes: ['XS', 'S', 'M', 'L', 'XL'],
+            colors: [
+                { name: 'Sunset Floral', value: 'default', hex: '#FFA07A' },
+                { name: 'Garden Green', value: 'green', hex: '#77DD77' }
+            ],
+            inStock: true,
+            stockCount: 12
         }
     ];
 
@@ -203,8 +275,8 @@ function ProductDetailPage() {
                                 <button
                                     onClick={() => setIsWishlisted(!isWishlisted)}
                                     className={`p-2 rounded-xl transition-all ${isWishlisted
-                                            ? 'bg-red-50 text-red-600'
-                                            : 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600'
+                                        ? 'bg-red-50 text-red-600'
+                                        : 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600'
                                         }`}
                                 >
                                     <Heart size={20} className={isWishlisted ? 'fill-current' : ''} />
@@ -282,8 +354,8 @@ function ProductDetailPage() {
                                                 key={index}
                                                 onClick={() => setCurrentImageIndex(index)}
                                                 className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${currentImageIndex === index
-                                                        ? 'border-indigo-500 ring-2 ring-indigo-200'
-                                                        : 'border-slate-200 hover:border-slate-300'
+                                                    ? 'border-indigo-500 ring-2 ring-indigo-200'
+                                                    : 'border-slate-200 hover:border-slate-300'
                                                     }`}
                                             >
                                                 <img
@@ -323,8 +395,8 @@ function ProductDetailPage() {
                                                         key={i}
                                                         size={16}
                                                         className={`${i < Math.floor(product.rating)
-                                                                ? 'text-yellow-400 fill-current'
-                                                                : 'text-slate-300'
+                                                            ? 'text-yellow-400 fill-current'
+                                                            : 'text-slate-300'
                                                             }`}
                                                     />
                                                 ))}
@@ -361,8 +433,8 @@ function ProductDetailPage() {
                                                 key={color.value}
                                                 onClick={() => setSelectedColor(color.value)}
                                                 className={`w-10 h-10 rounded-full border-2 transition-all ${selectedColor === color.value
-                                                        ? 'border-indigo-500 ring-2 ring-indigo-200'
-                                                        : 'border-slate-300 hover:border-slate-400'
+                                                    ? 'border-indigo-500 ring-2 ring-indigo-200'
+                                                    : 'border-slate-300 hover:border-slate-400'
                                                     }`}
                                                 style={{ backgroundColor: color.hex }}
                                                 title={color.name}
@@ -388,8 +460,8 @@ function ProductDetailPage() {
                                                 key={size}
                                                 onClick={() => setSelectedSize(size)}
                                                 className={`py-2 px-3 text-sm font-medium rounded-xl border transition-all ${selectedSize === size
-                                                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                                                        : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                                                    ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
+                                                    : 'border-slate-200 hover:border-slate-300 text-slate-700'
                                                     }`}
                                             >
                                                 {size}
@@ -496,8 +568,8 @@ function ProductDetailPage() {
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
                                             className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
-                                                    ? 'border-indigo-500 text-indigo-600'
-                                                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                                ? 'border-indigo-500 text-indigo-600'
+                                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
                                                 }`}
                                         >
                                             {tab.label}

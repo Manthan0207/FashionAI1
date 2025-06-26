@@ -40,6 +40,7 @@ async def virtual_tryon(
     vton_img: UploadFile = File(...),
     garm_img: UploadFile = File(...)
 ):
+    print("hi_vton")
     temp_path = None
     try:
         garm_img.file.seek(0)

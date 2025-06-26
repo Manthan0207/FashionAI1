@@ -117,6 +117,21 @@ export const useAuthStore = create((set) => (
             }
         },
 
+        saveOnboardData: async (data) => {
+            set({ isLoading: true, error: null })
+            try {
+
+                const response = await axios.put(`${API_URL}/api/auth/save-onboarding-data`, data);
+                set({ message: response.data.message, isLoading: false, user: response.data.user });
+            } catch (error) {
+                set({
+                    isLoading: false,
+                    error: error.response?.data?.message || "Error saving user image"
+                });
+                throw error;
+            }
+        }
+
 
     }
 ))
