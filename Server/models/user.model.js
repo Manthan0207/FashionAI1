@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { type } from "os";
 
 
 //by using timestamp : true then we will have createdAt and updatedAt fields automatically into document
@@ -59,7 +58,7 @@ const userSchema = new mongoose.Schema(
             default: []
         },
         fitType: {
-            type: "String",
+            type: String,
             default: ""
         },
 
@@ -78,7 +77,23 @@ const userSchema = new mongoose.Schema(
         },
         verificationTokenExpiresAt: {
             type: Date
+        },
+        store: {
+            name: { type: String, default: "" },
+            description: { type: String, default: "" },
+            logo: { type: String, default: "" },
+            contactEmail: { type: String, default: "" },
+            contactPhone: { type: String, default: "" },
+            location: { type: String, default: "" }
+        },
+        isSeller: { type: Boolean, default: false },
+        sellerSince: { type: Date, default: Date.now() },
+        approvalStatus: {
+            type: String,
+            enum: ["pending", "approved", "rejected"],
+            default: "approved"
         }
+
     }, { timestamps: true })
 
 export const User = mongoose.model('User', userSchema)

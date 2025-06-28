@@ -2,7 +2,7 @@ import express from 'express';
 import { connectDB } from './db/connectDB.js';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.route.js'
-// import userRouter from './routes/userDetails.route.js'
+import sellerRoutes from './routes/seller.route.js'
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
 
@@ -26,6 +26,7 @@ app.use(express.json({ limit: "10mb" })) //allows us to parse incoming requests 
 app.use(cookieParser()) //this will allow us to parse incoming cookies(to use cookies in req obj)
 
 app.use("/api/auth", authRoutes)
+app.use("/api/seller", sellerRoutes)
 // app.use("api/user-details", userRouter)
 
 app.listen(PORT, () => {

@@ -12,6 +12,10 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import LandingPage from "./pages/LandingPage";
 import OnBoarding from "./pages/OnBoarding";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import Profile from "./pages/Profile";
+import BecomeSeller from "./pages/BecomeSeller";
+import SellerDashboard from "./pages/SellerDashboard";
+import ProdUpload from "./pages/ProdUpload";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -92,6 +96,10 @@ function App() {
         <Route path='/landing-page' element={<LandingPage />} />
         <Route path='/onboard' element={<OnBoarding />} />
         <Route path='/product/:id' element={<ProductDetailPage />} />
+        <Route path='/profile' element={<Profile />}></Route>
+        <Route path='/become-seller' element={<BecomeSeller />}></Route>
+        <Route path='/seller-dashboard' element={<SellerDashboard />}></Route>
+        <Route path='/upload-product' element={<ProdUpload />}></Route>
       </Routes>
 
       <Toaster />

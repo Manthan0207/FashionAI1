@@ -1,0 +1,96 @@
+import mongoose from 'mongoose';
+
+const prodSchema = mongoose.Schema(
+    {
+        seller: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        name: {
+            type: String,
+            default: ""
+        },
+        description: {
+            type: String,
+            default: ""
+        },
+        price: {
+            type: Number,
+            default: 0
+        },
+        discountedPrice: {
+            type: Number,
+            default: -1
+        },
+        sizesAvailable: {
+            type: [String],
+            default: []
+        },
+        colors: {
+            type: [String],
+            default: []
+        },
+        fitType: {
+            type: String,
+            default: ""
+        },
+        gender: {
+            type: String,
+            default: ""
+        },
+        ageRange: {
+            type: String, // "18–24", "25–34", etc.
+            default: ""
+        },
+        styleTags: {
+            type: [String], // e.g., ["Casual", "Streetwear"]
+            default: []
+        },
+        stock: {
+            type: Number,
+            required: true,
+            default: 0
+        },
+        images: {
+            type: [String],
+            default: []
+        },
+        isFeatured: {
+            type: Boolean,
+            default: false
+        },
+        returnPolicyDays: {
+            type: Number,
+            default: 7
+        },
+        material: {
+            type: String,
+            default: ""
+        },
+        ratings: {
+            type: [Number],
+            default: []
+        },
+        reviews: {
+            type: [
+                {
+                    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },  // optional
+                    comment: String,
+                    date: { type: Date, default: Date.now }
+                }
+            ],
+            default: []
+        },
+        totalSales: {
+            type: Number,
+            default: 0
+        }
+
+
+
+    },
+    { timestamps: true }
+)
+
+export const Product = mongoose.model('Product', prodSchema)

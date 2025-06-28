@@ -1,70 +1,30 @@
-// // Sidebar.jsx
-// import React from "react";
-// import { Link, useLocation } from "react-router-dom";
-// import { Home, Shirt, Star, LogOut, User } from "lucide-react";
-// import { useAuthStore } from "../store/authStore";
-
-// const Sidebar = () => {
-//     const location = useLocation();
-//     const { logout } = useAuthStore();
-
-//     const navItems = [
-//         { to: "/dashboard", icon: <Home />, label: "Home" },
-//         { to: "/wardrobe", icon: <Shirt />, label: "Wardrobe" },
-//         { to: "/recommendations", icon: <Star />, label: "Recommendations" },
-//         { to: "/tryon", icon: <User />, label: "Virtual Try-On" },
-//     ];
-
-//     const iconSize = 24;
-
-//     return (
-//         <aside className="bg-gray-900 text-white w-20 hover:w-64 transition-all duration-300 h-screen fixed top-0 left-0 z-30 shadow-lg overflow-hidden">
-//             <div className="flex flex-col items-center py-6 h-full">
-//                 <h1 className="text-2xl font-bold mb-8 select-none text-center w-full">
-//                     <span className="hidden lg:inline">FashionAI</span>
-//                     <span className="lg:hidden">FAI</span>
-//                 </h1>
-
-//                 <nav className="flex flex-col space-y-6 w-full px-2">
-//                     {navItems.map((item) => (
-//                         <Link
-//                             key={item.to}
-//                             to={item.to}
-//                             className={`flex items-center gap-4 px-3 py-2 rounded-lg hover:bg-emerald-600 transition-colors duration-200 ${location.pathname === item.to ? "bg-emerald-700" : ""
-//                                 }`}
-//                         >
-//                             {React.cloneElement(item.icon, { size: iconSize })}
-//                             {/* <span className="whitespace-nowrap overflow-hidden hidden lg:inline-block">
-//                                 {item.label}
-//                             </span> */}
-//                         </Link>
-//                     ))}
-//                     <button
-//                         onClick={logout}
-//                         className="flex items-center gap-4 px-3 py-2 rounded-lg text-red-400 hover:bg-red-800 mt-auto w-full justify-start"
-//                     >
-//                         <LogOut size={iconSize} />
-//                         <span className="hidden lg:inline-block">Logout</span>
-//                     </button>
-//                 </nav>
-//             </div>
-//         </aside>
-//     );
-// };
-
-// export default Sidebar;
-
-
+"use client"
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { Home, ShoppingBag, Heart, User, Settings, Search, TrendingUp, Star, Menu, X, Sparkles } from "lucide-react"
+import {
+    Home,
+    ShoppingBag,
+    Heart,
+    User,
+    Settings,
+    Search,
+    TrendingUp,
+    Star,
+    Menu,
+    X,
+    Sparkles,
+    Store,
+} from "lucide-react"
+import { useAuthStore } from "../store/authStore"
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [isHovered, setIsHovered] = useState(false)
     const [isLargeScreen, setIsLargeScreen] = useState(false)
+    const { user } = useAuthStore()
+    const location = useLocation()
 
     // Detect screen size to handle sidebar state
     useEffect(() => {
@@ -72,18 +32,13 @@ const Sidebar = () => {
             setIsLargeScreen(window.innerWidth >= 1024)
         }
 
-        // Initial check
         checkScreenSize()
-
-        // Add resize listener
         window.addEventListener("resize", checkScreenSize)
-
-        // Cleanup
         return () => window.removeEventListener("resize", checkScreenSize)
     }, [])
 
     const menuItems = [
-        { icon: Home, label: "Dashboard", path: "/dashboard" },
+        { icon: Home, label: "Dashboard", path: "/" },
         { icon: ShoppingBag, label: "Collections", path: "/collections" },
         { icon: TrendingUp, label: "Trending", path: "/trending" },
         { icon: Heart, label: "Favorites", path: "/favorites" },
@@ -91,6 +46,7 @@ const Sidebar = () => {
         { icon: Search, label: "Discover", path: "/discover" },
         { icon: User, label: "Profile", path: "/profile" },
         { icon: Settings, label: "Settings", path: "/settings" },
+        ...(user?.isSeller ? [{ icon: Store, label: "Seller Dashboard", path: "/seller-dashboard" }] : []),
     ]
 
     const menuItemVariants = {
@@ -177,7 +133,8 @@ const Sidebar = () => {
                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full animate-pulse" />
                             </div>
                             <div
-                                className={`transition-all duration-300 ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}`}
+                                className={`transition-all duration-300 ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                                    }`}
                             >
                                 <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent whitespace-nowrap">
                                     StyleVault
@@ -191,8 +148,7 @@ const Sidebar = () => {
                     <nav className="flex-1 pt-6 px-4 overflow-y-auto">
                         <ul className="space-y-2">
                             {menuItems.map((item, index) => {
-                                const isActive = window.location.pathname.endsWith(item.path)
-
+                                const isActive = location.pathname === item.path
                                 return (
                                     <motion.li
                                         key={item.label}
@@ -216,20 +172,18 @@ const Sidebar = () => {
                                             {isActive && (
                                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 shimmer-animation" />
                                             )}
-
                                             <div
-                                                className={`relative z-10 flex-shrink-0 ${isActive ? "text-white" : "group-hover:text-indigo-600"}`}
+                                                className={`relative z-10 flex-shrink-0 ${isActive ? "text-white" : "group-hover:text-indigo-600"
+                                                    }`}
                                             >
                                                 <item.icon size={20} />
                                             </div>
-
                                             <span
                                                 className={`font-medium text-sm relative z-10 transition-all duration-300 whitespace-nowrap ${isActive ? "text-white" : "group-hover:text-indigo-600"
                                                     } ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}`}
                                             >
                                                 {item.label}
                                             </span>
-
                                             {isActive && isExpanded && (
                                                 <div className="ml-auto w-2 h-2 bg-white rounded-full relative z-10" />
                                             )}
@@ -243,7 +197,8 @@ const Sidebar = () => {
                     {/* User Profile Section */}
                     <div className="p-4 border-t border-slate-200/50">
                         <div
-                            className={`flex items-center ${isExpanded ? "space-x-3" : "justify-center"} p-3 rounded-xl bg-gradient-to-r from-slate-50 to-indigo-50 border border-slate-200/50`}
+                            className={`flex items-center ${isExpanded ? "space-x-3" : "justify-center"
+                                } p-3 rounded-xl bg-gradient-to-r from-slate-50 to-indigo-50 border border-slate-200/50`}
                         >
                             <div className="relative flex-shrink-0">
                                 <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -252,9 +207,10 @@ const Sidebar = () => {
                                 <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
                             </div>
                             <div
-                                className={`flex-1 transition-all duration-300 ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}`}
+                                className={`flex-1 transition-all duration-300 ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                                    }`}
                             >
-                                <p className="font-semibold text-slate-800 text-sm whitespace-nowrap">Alex Johnson</p>
+                                <p className="font-semibold text-slate-800 text-sm whitespace-nowrap">{user?.name || "Alex Johnson"}</p>
                                 <p className="text-slate-500 text-xs whitespace-nowrap">Premium Member</p>
                             </div>
                         </div>
@@ -262,16 +218,15 @@ const Sidebar = () => {
                 </div>
             </div>
 
-            {/* Add CSS for shimmer animation */}
-            <style jsx="true">{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%) skewX(-12deg); }
-          100% { transform: translateX(200%) skewX(-12deg); }
-        }
-        .shimmer-animation {
-          animation: shimmer 2s infinite;
-        }
-      `}</style>
+            <style jsx>{`
+                @keyframes shimmer {
+                    0% { transform: translateX(-100%) skewX(-12deg); }
+                    100% { transform: translateX(200%) skewX(-12deg); }
+                }
+                .shimmer-animation {
+                    animation: shimmer 2s infinite;
+                }
+            `}</style>
         </>
     )
 }

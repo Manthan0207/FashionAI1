@@ -126,9 +126,39 @@ export const useAuthStore = create((set) => (
             } catch (error) {
                 set({
                     isLoading: false,
-                    error: error.response?.data?.message || "Error saving user image"
+                    error: error.response?.data?.message || "Error saving on board data"
                 });
                 throw error;
+            }
+        },
+
+        becomeSeller: async (data) => {
+            set({ isLoading: true, error: null })
+            try {
+                const response = await axios.post(`${API_URL}/api/seller/become-seller`, data)
+                set({ message: response.data.message, isLoading: false, user: response.data.user })
+            } catch (error) {
+                set({
+                    isLoading: false,
+                    error: error.response?.data?.message || "Error in process if becoming user"
+                });
+                throw error;
+
+            }
+        },
+
+        addProduct: async (data) => {
+            set({ isLoading: true, error: null, message: null })
+            try {
+                const response = await axios.post(`${API_URL}/api/seller/add-product`, data)
+                set({ message: response.data.message, isLoading: false, user: response.data.user })
+            } catch (error) {
+                set({
+                    isLoading: false,
+                    error: error.response?.data?.message || "Error in process if becoming user"
+                });
+                throw error;
+
             }
         }
 
