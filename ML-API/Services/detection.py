@@ -48,6 +48,7 @@ def detect_faces_and_bodies(file: UploadFile) -> dict:
         raise HTTPException(400, "Unreadable image")
 
     rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    skintone = ""
 
     with mp.solutions.pose.Pose(static_image_mode=True,
                                 model_complexity=2,
@@ -84,8 +85,7 @@ def detect_faces_and_bodies(file: UploadFile) -> dict:
 
                    skintone = predict_skintone(face_pil, box)
                    
-               else :
-                   skintone = None
+              
                 
                
                

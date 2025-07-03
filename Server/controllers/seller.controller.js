@@ -125,3 +125,84 @@ export const addProduct = async (req, res) => {
         });
     }
 };
+
+
+export const getSellerProducts = async (req, res) => {
+    const id = req.userId;
+
+    try {
+        const Prods = await Product.find({ seller: id })
+        res.status(200).json({
+            message: "Seller Prod Sent Successful",
+            success: true,
+            prods: Prods
+        })
+    } catch (error) {
+        console.log("Error in getSellerProducts")
+        res.status(500).json({
+            message: "Internal Server Error",
+            success: false
+        }
+        )
+    }
+}
+
+export const getSingleProduct = async (req, res) => {
+    const id = req.userId;
+    const prodId = req.params.id
+
+
+    try {
+        const prod = await Product.findOne({ _id: prodId });
+        if (!prod) {
+            return res.status(404).json({ success: false, message: "Product not found" });
+        }
+
+        res.status(200).json({ success: true, message: "Product Fetch Successful", product: prod })
+    } catch (error) {
+        console.log("Error in getSingleProduct");
+        res.status(500).json({
+            message: "Internal Server Error",
+            success: false
+        })
+
+    }
+}
+
+export const updateProduct = async (req, res) => {
+    const u_id = req.userId;
+    const prod_id = req.params.id
+
+    const data = req.body
+    if (!prod_id || !data)
+        return res.status(400).json(
+            {
+                message: "Missing product ID or update data.",
+                success: false
+            })
+
+    try {
+        const updateProd = await Product.findOneAndUpdate({ _id: prod_id, seller: u_id }, data, { new: true });
+        if (!updateProd) {
+            return res.status(404).json({
+                message: "Product not found or you do not have permission to update it.",
+                success: false
+            });
+        }
+
+        const allProd = await Product.find({ seller: u_id })
+        res.status(200).json({
+            message: "Product Updated Successfully",
+            success: true,
+            prods: allProd,
+            updated_prod: updateProd
+        })
+    } catch (error) {
+        console.log("Error in updateProduct");
+        res.status(500).json({
+            message: "Internal Server Error",
+            success: false
+        })
+
+    }
+}

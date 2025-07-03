@@ -37,6 +37,7 @@ const Sidebar = () => {
         return () => window.removeEventListener("resize", checkScreenSize)
     }, [])
 
+
     const menuItems = [
         { icon: Home, label: "Dashboard", path: "/" },
         { icon: ShoppingBag, label: "Collections", path: "/collections" },
@@ -137,7 +138,7 @@ const Sidebar = () => {
                                     }`}
                             >
                                 <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent whitespace-nowrap">
-                                    StyleVault
+                                    Vesture
                                 </h1>
                                 <p className="text-slate-500 text-xs font-medium whitespace-nowrap">Fashion Forward</p>
                             </div>
@@ -162,8 +163,8 @@ const Sidebar = () => {
                                         <Link
                                             to={item.path}
                                             className={`group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-300 relative overflow-hidden ${isActive
-                                                    ? "bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-lg shadow-indigo-500/25"
-                                                    : "text-slate-600 hover:bg-slate-100 hover:text-indigo-600"
+                                                ? "bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-lg shadow-indigo-500/25"
+                                                : "text-slate-600 hover:bg-slate-100 hover:text-indigo-600"
                                                 }`}
                                             title={!isExpanded ? item.label : ""}
                                             onClick={() => !isLargeScreen && setIsOpen(false)}

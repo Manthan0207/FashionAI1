@@ -13,6 +13,7 @@ export const useAuthStore = create((set) => (
         isLoading: false,
         isCheckingAuth: true,
         message: null,
+        prods: [],
 
 
         signup: async (email, password, name) => {
@@ -160,8 +161,59 @@ export const useAuthStore = create((set) => (
                 throw error;
 
             }
-        }
+        },
 
+        getProducts: async (data) => {
+            set({ isLoading: true, error: null, message: null })
+            try {
+                const response = await axios.get(`${API_URL}/api/product/get-products`);
+                set({
+                    message: response.data.message, isLoading: false, prods: response.data.products
+
+                })
+            } catch (error) {
+                set({
+                    isLoading: false,
+                    error: error.response?.data?.message || "Error in process if becoming user"
+                });
+                throw error;
+            }
+        },
+
+        getSingleProduct: async (id) => {
+            set({ isLoading: true, error: null, message: null })
+            try {
+                const response = await axios.get(`${API_URL}/api/seller/product/${id}`)
+
+
+                set({
+                    message: response.data.message, isLoading: false
+                })
+                return response.data.product
+            } catch (error) {
+                set({
+                    isLoading: false,
+                    error: error.response?.data?.message || "Error in fetching single product"
+                });
+                throw error;
+            }
+        },
+        updateProduct: async (id, data) => {
+            set({ isLoading: true, error: null, message: null })
+            try {
+                const response = await axios.patch(`${API_URL}/api/seller/update-product/${id}`, data)
+                set({ isLoading: false, message: response.data.message, prods: response.data.prods })
+                return response.data.updated_prod
+            } catch (error) {
+                console.log(error);
+                set({
+                    isLoading: false,
+                    error: error.response?.data?.message || "Error in updating the product"
+                })
+                throw error;
+
+            }
+        }
 
     }
 ))

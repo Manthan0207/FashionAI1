@@ -1,52 +1,64 @@
 import React from 'react';
-import { User, Package, ShoppingCart, Clock, DollarSign, Store, Mail, Phone, Calendar, Eye, CheckCircle, AlertCircle, Box } from 'lucide-react';
+import { User, Package, ShoppingCart, Clock, DollarSign, Store, Mail, Phone, Calendar, Eye, CheckCircle, AlertCircle, Box, IndianRupee } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { useNavigate, Link } from 'react-router-dom';
 import SellerNavbar from '../components/SellerNavbar';
+import { useAuthStore } from '../store/authStore';
+import { useState } from 'react';
+import axios from 'axios';
+import { useEffect } from 'react';
 
 const SellerDashboard = () => {
-    const sellerData = {
-        storeName: "Bella Vista Fashion",
-        sellerSince: "January 2023",
-        email: "contact@bellavista.com",
-        phone: "+1 (555) 123-4567",
-        stats: {
-            totalProducts: 156,
-            productsSold: 89,
-            pendingApprovals: 12,
-            totalRevenue: 24750
-        },
-        recentUploads: [
-            {
-                id: 1,
-                name: "Summer Floral Dress",
-                image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=150&h=150&fit=crop&crop=center",
-                status: "approved",
-                uploadDate: "2 days ago"
-            },
-            {
-                id: 2,
-                name: "Casual Denim Jacket",
-                image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=150&h=150&fit=crop&crop=center",
-                status: "pending",
-                uploadDate: "3 days ago"
-            },
-            {
-                id: 3,
-                name: "Silk Evening Gown",
-                image: "https://images.unsplash.com/photo-1566479179817-c0eefdbea8ad?w=150&h=150&fit=crop&crop=center",
-                status: "approved",
-                uploadDate: "1 week ago"
-            },
-            {
-                id: 4,
-                name: "Cotton T-Shirt Set",
-                image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=150&h=150&fit=crop&crop=center",
-                status: "pending",
-                uploadDate: "1 week ago"
-            }
-        ]
+    const { user, getProducts } = useAuthStore()
+    const [prod, setProd] = useState([])
+    const [loading, setLoading] = useState(false)
+    const getData = async () => {
+        let prods = null;
+        let message = "";
+        let errors = null;
+
+        try {
+            const response = await axios.get('http://localhost:3000/api/seller/get-seller-prods');
+            prods = response.data.prods;
+            message = response.data.message;
+        } catch (error) {
+            errors = error.message;
+            message = "Error in getting data";
+        }
+
+        return { prods, message, errors };
     };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            const { prods, message, errors } = await getData();
+            setProd(prods);
+            setLoading(false);
+        };
+        fetchData();
+
+    }, []);
+
+    function formatDateWithOrdinal(dateString) {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.toLocaleString('en-GB', { month: 'long' });
+
+        const ordinal = (n) => {
+            if (n > 3 && n < 21) return 'th';
+            switch (n % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        };
+
+        return `${day}${ordinal(day)} ${month}`;
+    }
+
+
 
     const StatCard = ({ icon: Icon, title, value, bgColor, textColor }) => (
         <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition-shadow duration-200">
@@ -67,30 +79,23 @@ const SellerDashboard = () => {
             <div className="flex items-center space-x-4">
                 <div className="relative">
                     <img
-                        src={product.image}
+                        src={product.images[0]}
                         alt={product.name}
                         className="w-16 h-16 rounded-lg object-cover"
                     />
-                    <div className="absolute -top-1 -right-1">
-                        {product.status === 'approved' ? (
-                            <CheckCircle className="w-5 h-5 text-green-500 bg-white rounded-full" />
-                        ) : (
-                            <AlertCircle className="w-5 h-5 text-yellow-500 bg-white rounded-full" />
-                        )}
-                    </div>
+
                 </div>
                 <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-slate-900 truncate">{product.name}</h4>
                     <p className="text-xs text-slate-500 mt-1">{product.uploadDate}</p>
                     <div className="flex items-center mt-2">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${product.status === 'approved'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                            {product.status === 'approved' ? 'Approved' : 'Pending Review'}
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            ₹{product.price}
+
                         </span>
                     </div>
                 </div>
+
             </div>
         </div>
     );
@@ -116,7 +121,7 @@ const SellerDashboard = () => {
                                     </div>
                                     <div>
                                         <h1 className="text-3xl font-bold text-slate-900">Welcome back!</h1>
-                                        <p className="text-lg text-slate-600 mt-1">{sellerData.storeName}</p>
+                                        <p className="text-lg text-slate-600 mt-1">{user.store.name}</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -124,7 +129,7 @@ const SellerDashboard = () => {
                                         <Calendar className="w-4 h-4" />
                                         <span className="text-sm font-medium">Seller Since</span>
                                     </div>
-                                    <p className="text-lg font-semibold text-slate-900">{sellerData.sellerSince}</p>
+                                    <p className="text-lg font-semibold text-slate-900">{formatDateWithOrdinal(user.sellerSince)}</p>
                                 </div>
                             </div>
                         </div>
@@ -134,28 +139,30 @@ const SellerDashboard = () => {
                             <StatCard
                                 icon={Package}
                                 title="Total Products"
-                                value={sellerData.stats.totalProducts}
+                                value={prod.length}
                                 bgColor="bg-blue-100"
                                 textColor="text-blue-600"
                             />
                             <StatCard
                                 icon={ShoppingCart}
                                 title="Products Sold"
-                                value={sellerData.stats.productsSold}
+                                value={prod.reduce((sum, item) => sum + item.totalSales, 0)}
+
                                 bgColor="bg-green-100"
                                 textColor="text-green-600"
                             />
                             <StatCard
                                 icon={Clock}
                                 title="Pending Approvals"
-                                value={sellerData.stats.pendingApprovals}
+                                value={0}
                                 bgColor="bg-yellow-100"
                                 textColor="text-yellow-600"
                             />
                             <StatCard
                                 icon={DollarSign}
                                 title="Total Revenue"
-                                value={`${sellerData.stats.totalRevenue.toLocaleString()}`}
+                                // value={`${sellerData.stats.totalRevenue.toLocaleString()}`}
+                                value={prod.reduce((cur, next) => cur + (next.totalSales * next.price), 0)}
                                 bgColor="bg-indigo-100"
                                 textColor="text-indigo-600"
                             />
@@ -167,13 +174,13 @@ const SellerDashboard = () => {
                                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                                     <div className="flex items-center justify-between mb-6">
                                         <h2 className="text-xl font-bold text-slate-900">Recent Uploads</h2>
-                                        <button className="flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-medium">
+                                        <Link to='/seller-inventory' className="flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-medium">
                                             <Eye className="w-4 h-4" />
                                             <span>View All</span>
-                                        </button>
+                                        </Link>
                                     </div>
                                     <div className="space-y-4">
-                                        {sellerData.recentUploads.map((product) => (
+                                        {prod.map((product) => (
                                             <ProductCard key={product.id} product={product} />
                                         ))}
                                     </div>
@@ -191,7 +198,7 @@ const SellerDashboard = () => {
                                             </div>
                                             <div>
                                                 <p className="text-sm text-slate-500">Store Name</p>
-                                                <p className="font-semibold text-slate-900">{sellerData.storeName}</p>
+                                                <p className="font-semibold text-slate-900">{user.store.name}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-3">
@@ -200,7 +207,7 @@ const SellerDashboard = () => {
                                             </div>
                                             <div>
                                                 <p className="text-sm text-slate-500">Email</p>
-                                                <p className="font-semibold text-slate-900">{sellerData.email}</p>
+                                                <p className="font-semibold text-slate-900">{user.email}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-3">
@@ -209,7 +216,7 @@ const SellerDashboard = () => {
                                             </div>
                                             <div>
                                                 <p className="text-sm text-slate-500">Phone</p>
-                                                <p className="font-semibold text-slate-900">{sellerData.phone}</p>
+                                                <p className="font-semibold text-slate-900">{user.store.contactPhone}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -219,17 +226,27 @@ const SellerDashboard = () => {
                                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                                     <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
                                     <div className="space-y-3">
-                                        <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200">
+                                        <Link
+                                            to="/upload-product"
+                                            className="block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-center font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+                                        >
                                             Add New Product
-                                        </button>
-                                        <button className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
+                                        </Link>
+                                        <Link
+                                            to="/seller-analytics"
+                                            className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-center font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+                                        >
                                             View Analytics
-                                        </button>
-                                        <button className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
+                                        </Link>
+                                        <Link
+                                            to="/seller-inventory"
+                                            className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-center font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+                                        >
                                             Manage Inventory
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
