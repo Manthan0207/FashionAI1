@@ -18,6 +18,8 @@ import SellerDashboard from "./pages/SellerDashboard";
 import ProdUpload from "./pages/ProdUpload";
 import Inventory from "./pages/Inventory";
 import ProductEditPage from "./pages/ProductEditPage";
+import CartPage from "./pages/CartPage";
+
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -104,6 +106,7 @@ function App() {
         <Route path='/upload-product' element={<ProdUpload />}></Route>
         <Route path='/seller-inventory' element={<Inventory />}></Route>
         <Route path='/product-edit-page/:id' element={<ProductEditPage />}></Route>
+        <Route path='/cart' element={<CartPage />}></Route>
       </Routes>
 
       <Toaster />

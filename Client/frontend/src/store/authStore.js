@@ -1,5 +1,6 @@
 import { create } from 'zustand'; //zustand : state management lib
 import axios from 'axios';
+import { persist } from 'zustand/middleware'
 
 
 const API_URL = "http://localhost:3000"
@@ -14,6 +15,7 @@ export const useAuthStore = create((set) => (
         isCheckingAuth: true,
         message: null,
         prods: [],
+
 
 
         signup: async (email, password, name) => {
