@@ -221,6 +221,24 @@ export const useAuthStore = create(
 
                 getSalesDetails: async () => {
 
+                },
+
+
+                toggleProductActiveStatus: async (prodId) => {
+                    set({ isLoading: true, error: null, message: null });
+
+                    try {
+                        const response = await axios.put(`${API_URL}/api/product/change-product-status`, { prodId });
+
+                        set({ isLoading: false, error: null, message: response.data.message, prods: response.data.allProds });
+                        console.log("All Prods : ", response.data.allProds);
+
+                        return response.data.updatedProd;
+                    } catch (error) {
+                        console.log("error in auth store toggleProductActiveStatus");
+                        set({ isLoading: false, error: error.response.data.message });
+                        throw error;
+                    }
                 }
 
             }

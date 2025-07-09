@@ -68,7 +68,7 @@ const CheckoutPage = () => {
             toast.success("Order Successful")
             navigate('/order-success')
         } catch (error) {
-            alert("Order Failed Please Try Again");
+            toast.error("Order Failed Please Try Again");
 
 
         }

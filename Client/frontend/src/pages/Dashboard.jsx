@@ -66,6 +66,8 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             setLoading(true)
+            console.log("Getting");
+
             await getProducts()
             setLoading(false)
         }
@@ -236,7 +238,8 @@ const Dashboard = () => {
                         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
                     >
                         {filteredClothes.map((item) => (
-                            <motion.div
+                            (item.isActive) &&
+                            (<motion.div
                                 key={item._id}
                                 variants={itemVariants}
                                 whileHover={{ y: -8 }}
@@ -387,7 +390,7 @@ const Dashboard = () => {
 
 
                                 </div>
-                            </motion.div>
+                            </motion.div>)
                         ))}
                     </motion.div>
 

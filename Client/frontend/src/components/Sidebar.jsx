@@ -47,6 +47,7 @@ const Sidebar = () => {
         { icon: Search, label: "Discover", path: "/discover" },
         { icon: User, label: "Profile", path: "/profile" },
         { icon: Settings, label: "Settings", path: "/settings" },
+        { icon: ShoppingBag, label: "Orders", path: '/orders' },
         ...(user?.isSeller ? [{ icon: Store, label: "Seller Dashboard", path: "/seller-dashboard" }] : []),
     ]
 

@@ -85,6 +85,10 @@ const prodSchema = mongoose.Schema(
         totalSales: {
             type: Number,
             default: 0
+        },
+        isActive: {
+            type: Boolean,
+            default: true
         }
 
 

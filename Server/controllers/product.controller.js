@@ -51,3 +51,26 @@ export const getAllOrders = async (req, res) => {
 
     }
 }
+
+export const changeProductStatus = async (req, res) => {
+    const { prodId } = req.body;
+
+    try {
+        const product = await Product.findById(prodId);
+
+        if (!product)
+            return res.status(404).json({ success: false, message: "Product not found" });
+
+
+        product.isActive = !product.isActive;
+        const updatedProd = await product.save();
+
+        const allProds = await Product.find({});
+
+
+        res.status(200).json({ success: false, message: "Product Active Status Changed Successful", updatedProd, allProds })
+    } catch (error) {
+        console.log("Error in changeProductStatus");
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+    }
+} 

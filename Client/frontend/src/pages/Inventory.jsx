@@ -21,12 +21,16 @@ import {
     BarChart3,
     Settings,
     MoreVertical,
-    Loader2
+    Loader2,
+    ToggleLeft
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import SellerNavbar from '../components/SellerNavbar';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Power } from 'react-feather';
+import { toast } from 'react-hot-toast'
+import { useAuthStore } from '../store/authStore';
 
 
 
@@ -41,6 +45,8 @@ const Inventory = () => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [sortBy, setSortBy] = useState("newest");
     const navigate = useNavigate()
+
+    const { toggleProductActiveStatus, error } = useAuthStore();
 
 
 
@@ -68,10 +74,25 @@ const Inventory = () => {
             const { prods, message, errors } = await getData();
             setProducts(prods);
             setLoading(false);
+            console.log(prods);
+
         };
         fetchData();
 
     }, []);
+
+
+    const changeProductActiveStatus = async (prodId) => {
+        try {
+            const updatedProduct = await toggleProductActiveStatus(prodId);
+
+            const sellerUpdatedProds = products.map((val) => val._id == updatedProduct._id ? updatedProduct : val)
+            setProducts(sellerUpdatedProds);
+            toast.success("Active Status Changes Successfully")
+        } catch (err) {
+            toast.error(error)
+        }
+    }
 
     // Filter options
     const filterOptions = [
@@ -178,6 +199,186 @@ const Inventory = () => {
         const averageRating = product.ratings.length > 0 ? (product.ratings.reduce((sum, rating) => sum + rating, 0) / product.ratings.length).toFixed(1) : "0.0";
 
         return (
+            // <div className="bg-white rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 overflow-hidden">
+            //     <div className="relative">
+            //         <img
+            //             src={product.images?.[0] || `https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=200&fit=crop`}
+            //             alt={product.name}
+            //             className="w-full h-48 object-cover"
+            //             onError={(e) => {
+            //                 e.currentTarget.src = `https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=200&fit=crop`;
+            //             }}
+            //         />
+
+            //         {/* Badges */}
+            //         <div className="absolute top-3 left-3 flex flex-col space-y-2">
+            //             {product.isFeatured && (
+            //                 <span className="bg-purple-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+            //                     Featured
+            //                 </span>
+            //             )}
+            //             {discount > 0 && (
+            //                 <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+            //                     -{discount}%
+            //                 </span>
+            //             )}
+            //         </div>
+
+            //         {/* Actions Menu */}
+            //         <div className="absolute top-3 right-3">
+            //             <div className="relative">
+            //                 <button
+            //                     onClick={() => setShowActions(!showActions)}
+            //                     className="p-2 bg-white rounded-full shadow-md hover:bg-slate-50 transition-colors"
+            //                 >
+            //                     <MoreVertical size={16} />
+            //                 </button>
+
+            //                 {showActions && (
+            //                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-10">
+            //                         <button
+            //                             onClick={() => {
+            //                                 onEdit(product);
+            //                                 setShowActions(false);
+            //                             }}
+            //                             className="w-full px-4 py-2 text-left hover:bg-slate-50 flex items-center space-x-2"
+            //                         >
+            //                             <Edit size={16} />
+            //                             <span>Edit Product</span>
+            //                         </button>
+            //                         <button
+            //                             onClick={() => {
+            //                                 console.log("View details:", product);
+            //                                 setShowActions(false);
+            //                             }}
+            //                             className="w-full px-4 py-2 text-left hover:bg-slate-50 flex items-center space-x-2"
+            //                         >
+            //                             <Eye size={16} />
+            //                             <span>View Details</span>
+            //                         </button>
+            //                         <button
+            //                             onClick={() => {
+            //                                 onDelete(product);
+            //                                 setShowActions(false);
+            //                             }}
+            //                             className="w-full px-4 py-2 text-left hover:bg-red-50 text-red-600 flex items-center space-x-2"
+            //                         >
+            //                             <Trash2 size={16} />
+            //                             <span>Delete</span>
+            //                         </button>
+            //                     </div>
+            //                 )}
+            //             </div>
+            //         </div>
+
+            //         {/* Selection Checkbox */}
+            //         <div className="absolute bottom-3 left-3">
+            //             <input
+            //                 type="checkbox"
+            //                 checked={isSelected}
+            //                 onChange={() => onToggleSelect(product._id)}
+            //                 className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+            //             />
+            //         </div>
+            //     </div>
+
+            //     <div className="p-5">
+            //         <div className="flex items-center justify-between mb-2">
+            //             <h3 className="font-semibold text-lg text-slate-900 truncate flex-1 mr-2">
+            //                 {product.name}
+            //             </h3>
+            //             <span className={`px-2 py-1 rounded-full text-xs font-medium ${stockInfo.bgColor} ${stockInfo.color}`}>
+            //                 {stockInfo.status}
+            //             </span>
+            //         </div>
+
+            //         <p className="text-slate-600 text-sm mb-3 line-clamp-2">
+            //             {product.description || "No description available"}
+            //         </p>
+
+            //         {/* Product Details */}
+            //         <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+            //             <div className="flex items-center space-x-1">
+            //                 <Tag className="w-3 h-3 text-slate-500" />
+            //                 <span className="text-slate-600">{product.gender || "N/A"}</span>
+            //             </div>
+            //             <div className="flex items-center space-x-1">
+            //                 <Palette className="w-3 h-3 text-slate-500" />
+            //                 <span className="text-slate-600">{product.colors ? product.colors.length : 0} colors</span>
+            //             </div>
+            //             <div className="flex items-center space-x-1">
+            //                 <Ruler className="w-3 h-3 text-slate-500" />
+            //                 <span className="text-slate-600">{product.sizesAvailable ? product.sizesAvailable.length : 0} sizes</span>
+            //             </div>
+            //             <div className="flex items-center space-x-1">
+            //                 <Package className="w-3 h-3 text-slate-500" />
+            //                 <span className="text-slate-600">{product.stock} in stock</span>
+            //             </div>
+            //         </div>
+
+            //         {/* Price and Sales */}
+            //         <div className="flex items-center justify-between mb-3">
+            //             <div className="flex items-center space-x-2">
+            //                 <span className="text-lg font-bold text-indigo-600">
+            //                     ₹{product.discountedPrice > 0 ? product.discountedPrice : product.price}
+            //                 </span>
+            //                 {product.discountedPrice > 0 && (
+            //                     <span className="text-sm text-slate-400 line-through">
+            //                         ₹{product.price}
+            //                     </span>
+            //                 )}
+            //             </div>
+            //             <div className="text-right">
+            //                 <p className="text-xs text-slate-500">Total Sales</p>
+            //                 <p className="text-sm font-semibold text-slate-700">{product.totalSales}</p>
+            //             </div>
+            //         </div>
+
+            //         {/* Rating and Reviews */}
+            //         {product.ratings && product.ratings.length > 0 && (
+            //             <div className="flex items-center space-x-2 mb-3">
+            //                 <div className="flex items-center space-x-1">
+            //                     <Star size={14} className="text-yellow-400 fill-current" />
+            //                     <span className="text-sm text-slate-600">
+            //                         {averageRating}
+            //                     </span>
+            //                 </div>
+            //                 <span className="text-sm text-slate-400">
+            //                     ({product.reviews ? product.reviews.length : 0} reviews)
+            //                 </span>
+            //             </div>
+            //         )}
+
+            //         {/* Style Tags */}
+            //         {product.styleTags && product.styleTags.length > 0 && (
+            //             <div className="flex flex-wrap gap-1 mb-3">
+            //                 {product.styleTags.slice(0, 3).map((tag, index) => (
+            //                     <span key={index} className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs">
+            //                         {tag}
+            //                     </span>
+            //                 ))}
+            //                 {product.styleTags.length > 3 && (
+            //                     <span className="text-xs text-slate-500">+{product.styleTags.length - 3}</span>
+            //                 )}
+            //             </div>
+            //         )}
+
+            //         {/* Action Buttons */}
+            //         <div className="flex space-x-2">
+            //             <button
+            //                 onClick={() => onEdit(product)}
+            //                 className="flex-1 bg-indigo-500 text-white py-2 px-3 rounded-lg hover:bg-indigo-600 transition-colors font-medium text-sm"
+            //             >
+            //                 Edit
+            //             </button>
+            //             <button className="flex-1 bg-slate-100 text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-200 transition-colors font-medium text-sm">
+            //                 Analytics
+            //             </button>
+            //         </div>
+
+
+            //     </div>
+            // </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 overflow-hidden">
                 <div className="relative">
                     <img
@@ -188,7 +389,6 @@ const Inventory = () => {
                             e.currentTarget.src = `https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=200&fit=crop`;
                         }}
                     />
-
                     {/* Badges */}
                     <div className="absolute top-3 left-3 flex flex-col space-y-2">
                         {product.isFeatured && (
@@ -248,16 +448,6 @@ const Inventory = () => {
                                 </div>
                             )}
                         </div>
-                    </div>
-
-                    {/* Selection Checkbox */}
-                    <div className="absolute bottom-3 left-3">
-                        <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => onToggleSelect(product._id)}
-                            className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
-                        />
                     </div>
                 </div>
 
@@ -342,8 +532,23 @@ const Inventory = () => {
                         </div>
                     )}
 
+                    {/* Toggle Product Active Status (Repositioned) */}
+                    <div className="flex items-center justify-between mt-4">
+                        <span className="text-sm text-slate-600">{product.isActive ? "Disable" : "Enable"} Product</span>
+                        <button
+                            onClick={() => changeProductActiveStatus(product._id)}
+                            className={`relative inline-block w-12 h-6 rounded-full transition-all duration-300 ${product.isActive ? "bg-indigo-600" : "bg-gray-400"
+                                }`}
+                        >
+                            <span
+                                className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${product.isActive ? "transform translate-x-6" : ""
+                                    }`}
+                            ></span>
+                        </button>
+                    </div>
+
                     {/* Action Buttons */}
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 mt-4">
                         <button
                             onClick={() => onEdit(product)}
                             className="flex-1 bg-indigo-500 text-white py-2 px-3 rounded-lg hover:bg-indigo-600 transition-colors font-medium text-sm"
@@ -356,6 +561,9 @@ const Inventory = () => {
                     </div>
                 </div>
             </div>
+
+
+
         );
     };
 
