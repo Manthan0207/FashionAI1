@@ -19,6 +19,10 @@ import ProdUpload from "./pages/ProdUpload";
 import Inventory from "./pages/Inventory";
 import ProductEditPage from "./pages/ProductEditPage";
 import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderSuccessfulPage from "./pages/OrderConfirmation";
+import AllOrderPage from "./pages/AllOrderPage";
+import SellsDetails from "./pages/SellsDetails";
 
 
 const ProtectedRoute = ({ children }) => {
@@ -107,6 +111,10 @@ function App() {
         <Route path='/seller-inventory' element={<Inventory />}></Route>
         <Route path='/product-edit-page/:id' element={<ProductEditPage />}></Route>
         <Route path='/cart' element={<CartPage />}></Route>
+        <Route path='/checkout' element={<CheckoutPage />}></Route>
+        <Route path='/order-success' element={<OrderSuccessfulPage />}></Route>
+        <Route path='/orders' element={<AllOrderPage />}></Route>
+        <Route path='/seller-sales' element={<SellsDetails />}></Route>
       </Routes>
 
       <Toaster />

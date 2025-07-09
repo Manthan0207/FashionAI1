@@ -5,6 +5,7 @@ import { Search, Filter, Heart, ShoppingCart, Star, Eye, TrendingUp, Zap, Loader
 import { Link, useNavigate } from "react-router-dom"
 import { useAuthStore } from "../store/authStore"
 import { useCartStore } from "../store/cartStore"
+import toast from "react-hot-toast"
 
 
 const Dashboard = () => {
@@ -362,32 +363,7 @@ const Dashboard = () => {
                                         )}
                                     </div>
 
-                                    {/* <div className="flex space-x-2">
-                                        {/* <button
-                                            className="flex-1 bg-indigo-500 text-white py-2 px-4 rounded-xl hover:bg-indigo-600 transition-colors font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-                                            disabled={item.stock === 0}
-                                        >
-                                            Try On
-                                        </button> }
-                                        <button
-                                            className="flex-1 bg-green-500 text-white py-2 px-4 rounded-xl hover:bg-green-600 transition-colors font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-                                            disabled={item.stock === 0}
-                                        >
-                                            Buy Now
-                                        </button>
-                                        {/* <button
-                                            className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:bg-slate-100 disabled:cursor-not-allowed"
-                                            disabled={item.stock === 0}
-                                        >
-                                            <ShoppingCart size={18} />
-                                        </button> }
-                                        <button className="flex items-center gap-0 rounded-lg bg-black hover:bg-gray-800 text-white px-4 py-2 transition-colors duration-200 shadow-sm border border-transparent">
-                                            <ShoppingCart size={18} />
-                                            <span className="hidden md:inline">Add to Cart</span>
-                                        </button>
 
-
-                                    </div> */}
                                     <div className="flex gap-2">
                                         <button
                                             className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 active:bg-green-700 transition-colors duration-200 font-medium disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-400"
@@ -399,7 +375,10 @@ const Dashboard = () => {
                                         <button
                                             className="flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 active:bg-gray-900 transition-colors duration-200 shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-400"
                                             disabled={item.stock === 0}
-                                            onClick={() => addToCart(item)}
+                                            onClick={() => {
+                                                addToCart(item);
+                                                toast.success("Item Added To Cart")
+                                            }}
                                         >
                                             <ShoppingCart size={18} />
                                             <span className="hidden md:inline">Add to Cart</span>

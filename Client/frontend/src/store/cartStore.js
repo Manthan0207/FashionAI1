@@ -7,15 +7,43 @@ export const useCartStore = create(
             cart: [],
 
 
-            addToCart: (item) => set((state) => ({ cart: [...state.cart, item] })),
+            addToCart: (item) => set((state) => {
+                // console.log("item", item);
 
-            removeFromCart: (_id) => set(
-                (state) => ({ cart: state.cart.filter((val) => _id != val._id) })
-            ),
-            updateQuantity: (_id, newQuantity) => set(
+                const exists = state.cart ? state.cart.find((itm) => itm && itm._id === item._id && itm.color === item.color) : false;
+
+                if (exists) {
+                    const updatedCart = state.cart.map((val) => {
+                        if (val._id === item._id) {
+                            const quantity = typeof val.quantity === 'number' ? val.quantity : 0;
+                            return { ...val, quantity: quantity + 1 };
+                        }
+                        return val;
+                    });
+                    return { cart: updatedCart };
+                }
+
+                else {
+                    // console.log("Item added to cart", item);
+
+                    return (
+                        { cart: [...state.cart, { ...item, quantity: 1 }] }
+                    )
+                }
+            })
+            ,
+
+            removeFromCart: (_id, item) => {
+                const { cart } = get()
+
+                set(
+                    (state) => ({ cart: state.cart.filter((val) => !(_id == val._id && (val.color == item.color))) })
+                )
+            },
+            updateQuantity: (_id, item, newQuantity) => set(
                 (state) => ({
                     cart: state.cart.map((val) =>
-                        val._id === _id ? { ...val, quantity: newQuantity } : val
+                        (val._id === _id && val.color === item.color) ? { ...val, quantity: newQuantity } : val
                     )
                 })),
 
@@ -23,7 +51,9 @@ export const useCartStore = create(
 
             getCartTotal: () => {
                 const { cart } = get();
-                return cart.reduce((prev, next) => prev + (next.discountedPrice * (next.quantity ? next.quantity : 1)), 0)
+
+
+                return cart.reduce((prev, next) => prev + (next.discountedPrice * next.quantity), 0)
             },
 
             getCartCount: () => {

@@ -4,6 +4,7 @@ import { useCartStore } from "../store/cartStore"
 import { Link, useNavigate } from "react-router-dom"
 import Sidebar from "../components/Sidebar"
 import { motion } from "framer-motion"
+import toast from "react-hot-toast"
 
 
 
@@ -13,13 +14,15 @@ const CartPage = () => {
     const [promoCode, setPromoCode] = useState("")
     const [appliedPromo, setAppliedPromo] = useState(null)
 
-    const handleQuantityChange = (productId, newQuantity) => {
+    const handleQuantityChange = (productId, newQuantity, item) => {
         if (newQuantity < 1) {
-            removeFromCart(productId)
+            removeFromCart(productId, item)
         } else {
-            updateQuantity(productId, newQuantity)
+            updateQuantity(productId, item, newQuantity)
         }
     }
+    console.log("Cart : ", cart);
+
 
     const handleApplyPromo = () => {
         if (promoCode.toLowerCase() === "save10") {
@@ -27,7 +30,7 @@ const CartPage = () => {
         } else if (promoCode.toLowerCase() === "flat100") {
             setAppliedPromo({ code: "FLAT100", discount: 100, type: "fixed" })
         } else {
-            // Invalid promo code
+            toast.error("Invalid promo code")
             setAppliedPromo(null)
         }
     }
@@ -71,7 +74,7 @@ const CartPage = () => {
                             <div className="flex items-center gap-4">
                                 <button
                                     onClick={() => navigate('/')}
-                                    className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors"
+                                    className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
                                 >
                                     <ArrowLeft size={20} />
                                     <span>Back to Shopping</span>
@@ -113,7 +116,7 @@ const CartPage = () => {
                             <div className="flex items-center gap-4">
                                 <button
                                     onClick={() => navigate('/')}
-                                    className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors"
+                                    className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
                                 >
                                     <ArrowLeft size={20} />
                                     <span>Continue Shopping</span>
@@ -125,7 +128,7 @@ const CartPage = () => {
                             </div>
                             <button
                                 onClick={clearCart}
-                                className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors"
+                                className="flex items-center gap-2 cursor-pointer text-red-600 hover:text-red-700 transition-colors cursor-"
                             >
                                 <Trash2 size={18} />
                                 Clear Cart
@@ -147,7 +150,7 @@ const CartPage = () => {
                                 >
                                     {cart.map((item) => (
                                         <motion.div
-                                            key={item._id}
+                                            key={item._id + item.color}
                                             variants={itemVariants}
                                             className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
                                         >
@@ -155,7 +158,7 @@ const CartPage = () => {
                                                 <div className="flex gap-4">
                                                     <div className="relative">
                                                         <img
-                                                            src={item.images?.[0] || `https://placehold.co/150x150?text=${encodeURIComponent(item.name)}`}
+                                                            src={item.image ? item.image : `https://placehold.co/150x150?text=${encodeURIComponent(item.name)}`}
                                                             alt={item.name}
                                                             className="w-24 h-24 object-cover rounded-xl"
                                                             onError={(e) => {
@@ -180,6 +183,9 @@ const CartPage = () => {
                                                                     <span className="text-sm bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
                                                                         {item.material}
                                                                     </span>
+                                                                    <span className="text-sm bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
+                                                                        {item.color}
+                                                                    </span>
                                                                 </div>
 
                                                                 {/* Rating */}
@@ -195,8 +201,8 @@ const CartPage = () => {
                                                             </div>
 
                                                             <button
-                                                                onClick={() => removeFromCart(item._id)}
-                                                                className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                                                onClick={() => removeFromCart(item._id, item)}
+                                                                className="p-2 text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
                                                             >
                                                                 <Trash2 size={18} />
                                                             </button>
@@ -217,23 +223,26 @@ const CartPage = () => {
                                                             <div className="flex items-center space-x-3">
                                                                 <div className="flex items-center space-x-2 bg-slate-100 rounded-lg p-1">
                                                                     <button
-                                                                        onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
-                                                                        className="p-1 hover:bg-slate-200 rounded transition-colors"
+                                                                        onClick={() => handleQuantityChange(item._id, item.quantity - 1, item)}
+
+                                                                        className="p-1 hover:bg-slate-200 rounded transition-colors cursor-pointer"
                                                                     >
                                                                         <Minus size={16} />
                                                                     </button>
                                                                     <span className="w-8 text-center font-medium">{(item.quantity ? item.quantity : 1)}</span>
                                                                     <button
-                                                                        onClick={() => handleQuantityChange(item._id, (item.quantity ? item.quantity + 1 : 1))}
-                                                                        className="p-1 hover:bg-slate-200 rounded transition-colors"
+                                                                        onClick={() => handleQuantityChange(item._id, item.quantity + 1, item)}
+
+                                                                        className="p-1 hover:bg-slate-200 rounded transition-colors cursor-pointer"
                                                                         disabled={item.quantity >= item.stock}
                                                                     >
                                                                         <Plus size={16} />
                                                                     </button>
                                                                 </div>
                                                                 <span className="text-lg font-bold text-slate-800">
-                                                                    ₹{item.discountedPrice * (item.quantity ? item.quantity : 1)}
+                                                                    ₹{Number(item.discountedPrice) * (Number(item.quantity) || 1)}
                                                                 </span>
+
                                                             </div>
                                                         </div>
 
@@ -272,7 +281,7 @@ const CartPage = () => {
                                                 />
                                                 <button
                                                     onClick={handleApplyPromo}
-                                                    className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                                                    className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors cursor-pointer"
                                                 >
                                                     Apply
                                                 </button>
@@ -333,12 +342,12 @@ const CartPage = () => {
 
                                         {/* Action Buttons */}
                                         <div className="space-y-3">
-                                            <button className="w-full bg-indigo-500 text-white py-3 rounded-lg hover:bg-indigo-600 transition-colors font-medium flex items-center justify-center gap-2">
+                                            <button className="w-full bg-indigo-500 text-white py-3 rounded-lg hover:bg-indigo-600 transition-colors font-medium flex items-center justify-center gap-2 cursor-pointer" onClick={() => navigate('/checkout')}>
                                                 <CreditCard size={20} />
                                                 Proceed to Checkout
                                             </button>
 
-                                            <button className="w-full border border-slate-200 text-slate-700 py-3 rounded-lg hover:bg-slate-50 transition-colors font-medium flex items-center justify-center gap-2">
+                                            <button className="w-full border border-slate-200 text-slate-700 py-3 rounded-lg hover:bg-slate-50 transition-colors font-medium flex items-center justify-center gap-2 cursor-pointer">
                                                 <Heart size={20} />
                                                 Save for Later
                                             </button>

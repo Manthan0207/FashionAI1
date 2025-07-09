@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema(
             required: true,
             unique: true
         },
+        phone: {
+            type: Number,
+            default: -1
+        },
         password: {
             type: String,
             required: true,
@@ -16,6 +20,14 @@ const userSchema = new mongoose.Schema(
         name: {
             type: String,
             required: true
+        },
+        address: {
+            street: { type: String, default: "" },
+            city: { type: String, default: "" },
+            state: { type: String, default: "" },
+            country: { type: String, default: "" },
+            zip: { type: Number, default: -1 }
+
         },
         lastLogin: {
             type: Date,

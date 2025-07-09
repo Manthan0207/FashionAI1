@@ -4,6 +4,8 @@ import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } from '../mailtrap/emails.js'
 import crypto from 'crypto'
 import cloudinary from '../utils/cloudinary.config.js';
+import { Order } from '../models/orders.model.js';
+import mongoose from 'mongoose';
 
 export const signup = async (req, res) => {
     const { email, password, name } = req.body;
@@ -245,7 +247,7 @@ export const saveUserImage = async (req, res) => {
 export const saveOnboardData = async (req, res) => {
     try {
 
-        const { image, bodyType, goals, gender, ageRange, preferredClothingStyle, favColor, fitType } = req.body;
+        const { image, phone, address, bodyType, goals, gender, ageRange, preferredClothingStyle, favColor, fitType } = req.body;
         const userId = req.userId;
         if (!image) {
             res.status(400).json({ success: false, message: "Profile Pic is required" })
@@ -258,6 +260,7 @@ export const saveOnboardData = async (req, res) => {
         const updateUser = await User.findByIdAndUpdate(userId, {
             userImage: response.secure_url,
             bodyType,
+            phone,
             goals,
             gender,
             ageRange,
@@ -265,7 +268,8 @@ export const saveOnboardData = async (req, res) => {
             maxAge: maxAge,
             preferredClothingStyle,
             favColor,
-            fitType
+            fitType,
+            address
         }, { new: true })
 
         return res.status(200).json({
@@ -280,4 +284,56 @@ export const saveOnboardData = async (req, res) => {
         res.status(500).json("Internal Server Error")
     }
 
+}
+
+export const getSalesData = async (req, res) => {
+    const id = req.userId;
+
+    try {
+        const sellerSalesItems = await Order.aggregate(
+            [
+                { $unwind: "$items" },
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: "items.productId",
+                        foreignField: "_id",
+                        as: "productDetails"
+                    }
+                },
+                { $unwind: "$productDetails" },
+                {
+                    $match: {
+                        "productDetails.seller": new mongoose.Types.ObjectId(id)
+                    }
+                },
+                {
+                    $project: {
+                        orderId: "$_id",           // Rename _id to orderId
+                        buyer: "$user",            // Rename user to buyer
+                        item: "$items",            // Include the item from the order
+                        product: {                 // Include selected fields from productDetails
+                            _id: "$productDetails._id",
+                            name: "$productDetails.name",
+                            price: "$productDetails.price"
+                        },
+                        totalAmount: 1,            // Include totalAmount as-is
+                        status: 1,                 // Include status as-is
+                        paymentStatus: 1,          // Include paymentStatus as-is
+                        createdAt: 1               // Include createdAt as-is
+                    }
+                }
+
+            ]
+        )
+
+        console.log("Data : ", JSON.stringify(sellerSalesItems, null, 2));
+        res.status(200).json({ success: true, message: "Data Fetched Successfully", sellerSalesItems })
+
+    } catch (error) {
+        console.log("Error in the getSalesData", error);
+        console.log("Error Message  : ", error.message);
+
+        res.status(500).json({ success: false, message: error.message })
+    }
 }

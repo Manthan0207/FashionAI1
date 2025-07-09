@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import { useNavigate, Link } from 'react-router-dom';
 import SellerNavbar from '../components/SellerNavbar';
 import { useAuthStore } from '../store/authStore';
+import toast from 'react-hot-toast'
 
 // Moved FormSection outside to prevent re-renders
 const FormSection = ({ title, icon: Icon, children }) => (
@@ -45,6 +46,7 @@ const ProdUpload = () => {
     const [base64ImageFiles, setBase64ImageFiles] = useState([]);
     const [newTag, setNewTag] = useState('');
     const [newColor, setNewColor] = useState('');
+
 
     const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL'];
     const fitTypeOptions = ['Regular', 'Slim', 'Relaxed', 'Oversized', 'Tight'];
@@ -137,6 +139,9 @@ const ProdUpload = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Product data:', formData);
+        if (formData.colors.length != formData.images.length) {
+            return toast.error("The no of images and colors must be same!")
+        }
         await addProduct(formData)
         alert('Product uploaded successfully!');
     };
@@ -422,6 +427,7 @@ const ProdUpload = () => {
                                 <div className="space-y-6">
                                     <FormSection title="Product Images" icon={Image}>
                                         <div className="space-y-4">
+                                            <span className="text-center text-sm text-black text-shadow-black font-bold">Please Add the images in sequence of color</span>
                                             <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-indigo-400 transition-colors">
                                                 <input
                                                     type="file"
