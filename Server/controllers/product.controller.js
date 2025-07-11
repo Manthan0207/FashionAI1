@@ -30,13 +30,25 @@ export const placeOrder = async (req, res) => {
             }
         )
 
+        await Promise.all(
+            data.items.map(item => updateProdData(item, item.productId))
+        );
+
+
         await orders.save()
         res.status(200).json({ success: true, message: "Order Placed Successfully", orders: orders })
     } catch (error) {
         console.log("error in the placeOrder");
+        console.log(error.message);
+
         res.status(500).json({ success: false, message: "Internal Server Error " + error.message })
     }
 }
+
+
+
+
+
 
 export const getAllOrders = async (req, res) => {
     const id = req.userId;
@@ -73,4 +85,51 @@ export const changeProductStatus = async (req, res) => {
         console.log("Error in changeProductStatus");
         res.status(500).json({ success: false, message: "Internal Server Error" })
     }
-} 
+}
+
+
+export const reviewProduct = async (req, res) => {
+    const userId = req.userId;
+    const { prodId, review, rating } = req.body;
+
+    try {
+        let product = await Product.findOneAndUpdate(
+            { _id: prodId, "reviews.user": userId },
+            { $set: { "reviews.$.rating": rating, "reviews.$.comment": review } },
+            { new: true }
+        );
+
+        if (!product) {
+            product = await Product.findOneAndUpdate(
+                { _id: prodId },
+                {
+                    $push: {
+                        reviews: {
+                            user: userId,
+                            rating: rating,
+                            comment: review || "",
+                            date: new Date()
+                        }
+                    }
+                },
+                { new: true }
+            );
+        }
+
+        const allProd = await Product.find({});
+
+
+        res.status(200).json({ success: true, message: "Review Submitted", product, allProd })
+
+    } catch (error) {
+        console.log("Error in reviewProduct ", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+
+    }
+}
+
+const updateProdData = async (item, id) => {
+    await Product.findByIdAndUpdate(id, { $inc: { totalSales: item.quantity, stock: -item.quantity } })
+}
+
+

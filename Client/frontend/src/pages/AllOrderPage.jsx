@@ -21,9 +21,12 @@ import {
     CreditCard,
     Banknote,
     Wallet,
-    Loader2
+    Loader2,
+    Edit3
 } from "lucide-react"
 import { useOrderStore } from '../store/orderStore'
+import toast from 'react-hot-toast'
+import { useAuthStore } from '../store/authStore'
 // Note: Replace with your actual routing solution
 // import { Link, useNavigate } from 'react-router-dom'
 
@@ -36,6 +39,14 @@ function AllOrderPage() {
     const [sortBy, setSortBy] = useState("newest");
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [showOrderDetails, setShowOrderDetails] = useState(false);
+    const [showProductSelectionModal, setShowProductSelectionModal] = useState(false);
+    const [selectedOrderForReview, setSelectedOrderForReview] = useState(null);
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [selectedItemForReview, setSelectedItemForReview] = useState(null);
+    const [rating, setRating] = useState(0);
+    const [reviewText, setReviewText] = useState("");
+
+    const { reviewProduct, user, prods } = useAuthStore();
 
     // const navigate = useNavigate(); // Replace with your navigation function
 
@@ -148,6 +159,251 @@ function AllOrderPage() {
             hour: '2-digit',
             minute: '2-digit'
         });
+    };
+
+    const handleReviewSubmit = async (item, rating, reviewText) => {
+        console.log("Review submitted for product:", {
+            prodId: item.productId,
+            rating,
+            review: reviewText
+        });
+        const data = {
+            prodId: item.productId,
+            rating,
+            review: reviewText
+        }
+
+
+        try {
+            await reviewProduct(data);
+
+            // Close modal and reset selected item
+            setShowReviewModal(false);
+            setSelectedItemForReview(null);
+
+            // Show success message
+            toast.success("Review submitted successfully!");
+        } catch (error) {
+            setShowReviewModal(false);
+            setSelectedItemForReview(null);
+            toast.error("Please try again")
+        }
+    };
+
+    // console.log("Selected : ", selectedItemForReview);
+
+    //                     const isReviewed = selectedItemForReview.reviews.map((revs) => revs.user == user._id)
+    //                     setShowReviewModal(false);
+    //                     if (isReviewed) {
+    //                         setRating(isReviewed.rating)
+    //                         setReviewText(isReviewed.comment)
+    //                     }
+
+
+
+    const ProductSelectionModal = ({ order, onClose, onSelectProduct }) => {
+        if (!order) return null;
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="bg-white rounded-2xl shadow-2xl max-w-md w-full"
+                >
+                    {/* Header */}
+                    <div className="border-b border-slate-200 p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-800">Select Product to Review</h2>
+                                <p className="text-slate-600">Choose a product from order #{order._id.slice(-8)}</p>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                            >
+                                <XCircle size={24} className="text-slate-600" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                        <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                            {order.items.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 cursor-pointer transition-colors"
+                                    onClick={() => onSelectProduct(item)}
+                                >
+                                    <img
+                                        src={item.image || `https://placehold.co/80x80?text=Product`}
+                                        alt="Product"
+                                        className="w-16 h-16 object-cover rounded-lg"
+                                    />
+                                    <div className="flex-1">
+                                        <h3 className="font-medium text-slate-800">Product ID: {item.productId}</h3>
+                                        <p className="text-sm text-slate-600">
+                                            Size: {item.size} | Color: {item.color} | Qty: {item.quantity}
+                                        </p>
+                                    </div>
+                                    <div className="text-indigo-500">
+                                        <Edit3 size={20} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-6 flex justify-end">
+                            <button
+                                onClick={onClose}
+                                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+        );
+    };
+
+    const ReviewModal = ({ item, onClose, onSubmit }) => {
+        const [rating, setRating] = useState(0);
+        const [reviewText, setReviewText] = useState("");
+        console.log("Item :", item);
+        console.log(typeof item);
+        console.log("ProdId ", typeof item, item.productId);
+        console.log("ProdId in prods ", typeof prods[0]._id, prods[0]._id);
+
+        console.log("UserId ", typeof user._id);
+
+        console.log("Found Prod : ", prods.find((itm) => String(item.productId) === itm._id)
+            .reviews.find((matchUserId) => String(matchUserId.user) === String(user._id))
+        );
+
+        const matchedProd = prods.find((itm) => String(item.productId) === itm._id)
+            .reviews.find((matchUserId) => String(matchUserId.user) === String(user._id));
+
+
+
+
+
+
+
+        useEffect(() => {
+            console.log(prods);
+            setReviewText(matchedProd.comment);
+            setRating(matchedProd.rating);
+        }
+            , []);
+        if (!item) return null;
+
+        const handleSubmit = () => {
+            onSubmit(item, rating, reviewText);
+            // Reset local state after submission
+            setRating(0);
+            setReviewText("");
+        };
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="bg-white rounded-2xl shadow-2xl max-w-md w-full"
+                >
+                    {/* Header */}
+                    <div className="border-b border-slate-200 p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-800">Leave a Review</h2>
+                                <p className="text-slate-600">Share your experience with this product</p>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                            >
+                                <XCircle size={24} className="text-slate-600" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                        {/* Product Info */}
+                        <div className="flex items-center gap-4 mb-6 p-4 bg-slate-50 rounded-xl">
+                            <img
+                                src={item.image || `https://placehold.co/80x80?text=Product`}
+                                alt="Product"
+                                className="w-16 h-16 object-cover rounded-lg"
+                            />
+                            <div>
+                                <h3 className="font-medium text-slate-800">Product ID: {item.productId}</h3>
+                                <p className="text-sm text-slate-600">
+                                    Size: {item.size} | Color: {item.color}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Rating */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-slate-700 mb-3">
+                                How would you rate this product?
+                            </label>
+                            <div className="flex justify-center gap-2">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        onClick={() => setRating(star)}
+                                        className="text-3xl focus:outline-none transition-colors"
+                                    >
+                                        {star <= rating ? (
+                                            <span className="text-yellow-500">★</span>
+                                        ) : (
+                                            <span className="text-slate-300">☆</span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Review */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-slate-700 mb-3">
+                                Your Review
+                            </label>
+                            <textarea
+                                value={reviewText}
+                                onChange={(e) => setReviewText(e.target.value)}
+                                className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[120px] transition-all"
+                                placeholder="Share details about your experience with this product..."
+                            />
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-3">
+                            <button
+                                onClick={onClose}
+                                className="flex-1 border border-slate-300 text-slate-700 py-3 rounded-lg hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSubmit}
+                                disabled={rating === 0}
+                                className={`flex-1 py-3 rounded-lg text-white font-medium transition ${rating === 0
+                                    ? "bg-indigo-300 cursor-not-allowed"
+                                    : "bg-indigo-500 hover:bg-indigo-600"
+                                    }`}
+                            >
+                                Submit Review
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+        );
     };
 
     const OrderDetailsModal = ({ order, onClose }) => {
@@ -540,14 +796,21 @@ function AllOrderPage() {
                                                             setSelectedOrder(order);
                                                             setShowOrderDetails(true);
                                                         }}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                                                        className="flex items-center gap-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors
+                                                        cursor-pointer"
                                                     >
                                                         <Eye size={16} />
                                                         <span>View Details</span>
                                                     </button>
-                                                    <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                                                        <Download size={16} />
-                                                        <span>Invoice</span>
+                                                    <button
+                                                        onClick={() => {
+                                                            setSelectedOrderForReview(order);
+                                                            setShowProductSelectionModal(true);
+                                                        }}
+                                                        className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                                                    >
+                                                        <Edit3 size={16} />
+                                                        <span>Leave a Review</span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -584,6 +847,39 @@ function AllOrderPage() {
                         setShowOrderDetails(false);
                         setSelectedOrder(null);
                     }}
+                />
+            )}
+
+            {/* Product Selection Modal */}
+            {showProductSelectionModal && selectedOrderForReview && (
+                <ProductSelectionModal
+                    order={selectedOrderForReview}
+                    onClose={() => {
+                        setShowProductSelectionModal(false);
+                        setSelectedOrderForReview(null);
+                    }}
+                    onSelectProduct={(item) => {
+                        setShowProductSelectionModal(false);
+                        setSelectedOrderForReview(null);
+                        setSelectedItemForReview(item);
+                        setShowReviewModal(true);
+                    }}
+                />
+            )}
+
+            {/* Review Modal */}
+            {showReviewModal && selectedItemForReview && (
+                <ReviewModal
+                    item={selectedItemForReview}
+                    onClose={() => {
+                        setShowReviewModal(false);
+                        setSelectedItemForReview(null);
+                        // Remove these lines since state is managed locally in modal:
+                        // setRating(0);
+                        // setReviewText("");
+                    }}
+                    onSubmit={handleReviewSubmit}
+
                 />
             )}
         </div>

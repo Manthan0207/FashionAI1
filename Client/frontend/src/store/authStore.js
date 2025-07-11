@@ -156,11 +156,30 @@ export const useAuthStore = create(
                     set({ isLoading: true, error: null, message: null })
                     try {
                         const response = await axios.post(`${API_URL}/api/seller/add-product`, data)
-                        set({ message: response.data.message, isLoading: false, user: response.data.user })
+                        set({ message: response.data.message, isLoading: false })
                     } catch (error) {
                         set({
                             isLoading: false,
-                            error: error.response?.data?.message || "Error in process if becoming user"
+                            error: error.response?.data?.message || "Error in add product"
+                        });
+                        throw error;
+
+                    }
+                },
+
+                deleteProduct: async (prodId) => {
+                    set({ isLoading: true, error: null, message: null })
+                    try {
+                        const response = await axios.delete(`${API_URL}/api/seller/delete-product`,
+                            {
+                                data: { prodId }
+                            }
+                        )
+                        set({ message: response.data.message, isLoading: false })
+                    } catch (error) {
+                        set({
+                            isLoading: false,
+                            error: error.response?.data?.message || "Error in deleting product"
                         });
                         throw error;
 
@@ -236,6 +255,23 @@ export const useAuthStore = create(
                         return response.data.updatedProd;
                     } catch (error) {
                         console.log("error in auth store toggleProductActiveStatus");
+                        set({ isLoading: false, error: error.response.data.message });
+                        throw error;
+                    }
+                },
+
+                reviewProduct: async (data) => {
+
+                    set({ isLoading: true, error: null, message: null });
+
+                    try {
+                        const response = await axios.put(`${API_URL}/api/product/review-product`, data);
+
+                        set({ isLoading: false, error: null, message: response.data.message, prods: response.data.allProd });
+
+                        return response.data.product;
+                    } catch (error) {
+                        console.log("error in auth store reviewProduct ");
                         set({ isLoading: false, error: error.response.data.message });
                         throw error;
                     }

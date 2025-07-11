@@ -30,7 +30,7 @@ const Dashboard = () => {
 
     // Calculate stats from real data
     const stats = {
-        totalItems: prods?.length || 0,
+        totalItems: prods.filter((item) => item.isActive).length,
         newArrivals: prods?.filter(p => {
             const createdDate = new Date(p.createdAt);
             const thirtyDaysAgo = new Date();

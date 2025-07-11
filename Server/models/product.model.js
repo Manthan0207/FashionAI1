@@ -68,20 +68,19 @@ const prodSchema = mongoose.Schema(
             type: String,
             default: ""
         },
-        ratings: {
-            type: [Number],
-            default: []
-        },
+
         reviews: {
             type: [
                 {
-                    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },  // optional
-                    comment: String,
+                    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+                    rating: { type: Number, min: 1, max: 5, required: true },
+                    comment: { type: String },
                     date: { type: Date, default: Date.now }
                 }
             ],
             default: []
         },
+
         totalSales: {
             type: Number,
             default: 0

@@ -327,7 +327,6 @@ export const getSalesData = async (req, res) => {
             ]
         )
 
-        console.log("Data : ", JSON.stringify(sellerSalesItems, null, 2));
         res.status(200).json({ success: true, message: "Data Fetched Successfully", sellerSalesItems })
 
     } catch (error) {

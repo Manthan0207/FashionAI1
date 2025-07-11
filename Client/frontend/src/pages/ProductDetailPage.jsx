@@ -90,8 +90,8 @@ function ProductDetailPage() {
 
     const discountPercentage = Math.round(((product.price - product.discountedPrice) / product.price) * 100);
 
-    const averageRating = product.ratings.length > 0 ?
-        (product.ratings.reduce((a, b) => a + b, 0) / product.ratings.length).toFixed(1) : 0;
+    const totalRating = product.reviews.reduce((cur, next) => cur + next.rating, 0);
+    const averageRating = totalRating / product.reviews.length
 
     return (
         <div className="flex min-h-screen bg-slate-50">

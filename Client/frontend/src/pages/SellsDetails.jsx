@@ -6,10 +6,10 @@ import {
     RefreshCw, BarChart2, PieChart, ShoppingCart,
     CheckCircle, XCircle, Clock, User
 } from 'react-feather';
-import axios from 'axios';
 import { ArrowDownRight } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import SellerNavbar from '../components/SellerNavbar';
+import { useOrderStore } from '../store/orderStore';
 
 const SellsDetails = () => {
     const [timeFilter, setTimeFilter] = useState('month');
@@ -18,16 +18,17 @@ const SellsDetails = () => {
     const [stats, setStats] = useState({});
     const [loading, setLoading] = useState(true);
 
+    const { geSalesDetails } = useOrderStore();
+
 
     useEffect(() => {
-        // Simulate API call
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await axios.get("http://localhost:3000/api/auth/seller-data")
+                const salesData = await geSalesDetails();
 
-                setSalesData(response.data.sellerSalesItems);
-                calculateStats(response.data.sellerSalesItems);
+                setSalesData(salesData);
+                calculateStats(salesData);
             } catch (error) {
                 console.error("Failed to fetch sales data:", error);
             } finally {

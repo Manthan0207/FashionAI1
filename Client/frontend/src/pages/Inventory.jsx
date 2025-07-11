@@ -31,6 +31,8 @@ import { useNavigate } from 'react-router-dom';
 import { Power } from 'react-feather';
 import { toast } from 'react-hot-toast'
 import { useAuthStore } from '../store/authStore';
+import Swal from 'sweetalert2'
+
 
 
 
@@ -46,7 +48,7 @@ const Inventory = () => {
     const [sortBy, setSortBy] = useState("newest");
     const navigate = useNavigate()
 
-    const { toggleProductActiveStatus, error } = useAuthStore();
+    const { toggleProductActiveStatus, error, deleteProduct } = useAuthStore();
 
 
 
@@ -120,7 +122,7 @@ const Inventory = () => {
                 matchesFilter = product.stock > 0 && product.stock <= 10;
                 break;
             case "Out of Stock":
-                matchesFilter = product.stock === 0;
+                matchesFilter = (product.stock === 0);
                 break;
             case "Featured":
                 matchesFilter = product.isFeatured;
@@ -164,7 +166,7 @@ const Inventory = () => {
         totalProducts: products.length,
         inStock: products.filter(p => p.stock > 10).length,
         lowStock: products.filter(p => p.stock > 0 && p.stock <= 10).length,
-        outOfStock: products.filter(p => p.stock === 0).length,
+        outOfStock: products.filter(p => (p.stock === 0) || !p.isActive).length,
         featured: products.filter(p => p.isFeatured).length,
         totalValue: products.reduce((sum, p) => sum + (p.price * p.stock), 0),
         totalSales: products.reduce((sum, p) => sum + p.totalSales, 0)
@@ -572,12 +574,29 @@ const Inventory = () => {
         navigate(`/product-edit-page/${product._id}`)
     };
 
-    const handleDelete = (product) => {
-        if (window.confirm(`Are you sure you want to delete "${product.name}"?`)) {
-            setProducts(prev => prev.filter(p => p._id !== product._id));
-            console.log("Deleted product:", product);
+    const handleDelete = async (product) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await deleteProduct(product._id);
+                toast.success("Product Deleted Successfully");
+                setProducts(products.filter((item) => item._id != product._id))
+            } catch (error) {
+                toast.error("Product Deletion Failed")
+            }
         }
     };
+
+
 
     const handleToggleSelect = (productId) => {
         setSelectedProducts(prev =>

@@ -45,6 +45,23 @@ export const useOrderStore = create(
 
 
                     }
+                },
+
+                geSalesDetails: async () => {
+                    set({ isLoading: true, message: null, error: null })
+                    try {
+                        const response = await axios.get("http://localhost:3000/api/auth/seller-data");
+                        set({ isLoading: false, message: response.data.message })
+
+
+                        return response.data.sellerSalesItems;
+
+                    } catch (error) {
+                        console.log("Error in geSalesDetails in orderStore");
+                        set({ isLoading: false, error: error.response.data.message })
+                        throw error;
+
+                    }
                 }
             }
         ),

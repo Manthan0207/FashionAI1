@@ -66,6 +66,7 @@ const CheckoutPage = () => {
         try {
             const response = await placeOrder(data)
             toast.success("Order Successful")
+            clearCart()
             navigate('/order-success')
         } catch (error) {
             toast.error("Order Failed Please Try Again");
