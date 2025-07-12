@@ -13,8 +13,10 @@ const Dashboard = () => {
     const [activeCategory, setActiveCategory] = useState("All")
     const [loading, setLoading] = useState(true)
 
-    const { getProducts, prods } = useAuthStore()
+    const { getProducts, prods, toggleWishlist } = useAuthStore()
     const { cart, addToCart } = useCartStore()
+
+    const { user } = useAuthStore()
 
     const navigate = useNavigate()
 
@@ -84,6 +86,15 @@ const Dashboard = () => {
             console.log("Updated products from store:", prods);
         }
     }, [prods]);
+
+    const handleToggleWishlist = async (id) => {
+        try {
+            await toggleWishlist(id);
+        } catch (err) {
+            console.error('Failed to toggle wishlist', err);
+        }
+    };
+
 
     if (loading) {
         return (
@@ -287,8 +298,12 @@ const Dashboard = () => {
 
                                     {/* Action Buttons */}
                                     <div className="absolute top-3 right-3 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors">
-                                            <Heart size={16} className="hover:text-red-500" />
+                                        <button
+                                            onClick={() => handleToggleWishlist(item._id)}
+                                            className={`p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors ${(user?.wishlist?.includes(item._id)) ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600'}`}>
+
+
+                                            <Heart size={16} className={(user?.wishlist?.includes(item._id)) ? 'fill-current' : ''} />
                                         </button>
                                         <button className="p-2 bg-white rounded-full shadow-md hover:bg-blue-50 transition-colors">
                                             <Eye size={16} className="hover:text-blue-500" />

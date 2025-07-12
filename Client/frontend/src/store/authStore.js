@@ -189,6 +189,8 @@ export const useAuthStore = create(
                 getProducts: async (data) => {
                     set({ isLoading: true, error: null, message: null })
                     try {
+                        // console.log("Hola Amigo");
+
                         const response = await axios.get(`${API_URL}/api/product/get-products`);
                         set({
                             message: response.data.message, isLoading: false, prods: response.data.products
@@ -275,6 +277,22 @@ export const useAuthStore = create(
                         set({ isLoading: false, error: error.response.data.message });
                         throw error;
                     }
+                },
+                toggleWishlist: async (id) => {
+                    set({ isLoading: true, error: null, message: null });
+                    try {
+                        console.log(id);
+
+                        const response = await axios.put(`${API_URL}/api/product/toggle-wishlist`, { prodId: id });
+
+                        set({ isLoading: false, error: null, message: response.data.message, user: response.data.updatedUser });
+                    } catch (error) {
+                        console.log("error in auth store toggleWishlist ", error.message);
+                        set({ isLoading: false, error: error?.response?.data?.message || "Something went wrong while toggling wishlist" });
+                        throw error;
+                    }
+
+
                 }
 
             }

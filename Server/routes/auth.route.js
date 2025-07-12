@@ -29,4 +29,5 @@ router.get('/seller-data', verifyToken, getSalesData)
 
 
 
+
 export default router

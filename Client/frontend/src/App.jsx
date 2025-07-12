@@ -23,6 +23,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrderSuccessfulPage from "./pages/OrderConfirmation";
 import AllOrderPage from "./pages/AllOrderPage";
 import SellsDetails from "./pages/SellsDetails";
+import Wishlist from "./pages/Wishlist";
 
 
 const ProtectedRoute = ({ children }) => {
@@ -115,6 +116,7 @@ function App() {
         <Route path='/order-success' element={<OrderSuccessfulPage />}></Route>
         <Route path='/orders' element={<AllOrderPage />}></Route>
         <Route path='/seller-sales' element={<SellsDetails />}></Route>
+        <Route path='/wishlist' element={<Wishlist />}></Route>
       </Routes>
 
       <Toaster />

@@ -6,25 +6,33 @@ import Sidebar from '../components/Sidebar';
 import {
     Heart, Share2, Star, ShoppingCart, ArrowLeft,
     Truck, Shield, RotateCcw, Ruler, ChevronLeft, ChevronRight,
-    Zap, CheckCircle, Info, Users, Sparkles, ShoppingCartIcon
+    Zap, CheckCircle, Info, Users, Sparkles, ShoppingCartIcon,
+    MessageSquare, Calendar, User, ThumbsUp, X
 } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
 
 function ProductDetailPage() {
     const { id } = useParams();
-    const { user, prods } = useAuthStore();
+    const { user, prods, getSingleProduct, toggleWishlist } = useAuthStore();
     const { cart, addToCart } = useCartStore();
     const [product, setProduct] = useState(null)
 
     const navigate = useNavigate()
 
     useEffect(() => {
-        console.log(id);
-        console.log(prods);
+        const fetchProduct = async () => {
+            const prod = await getSingleProduct(id);
+            console.log("Fetched Product:", prod);
+            setProduct(prod);
+        };
 
-        const product = prods.find(item => item._id === id);
-        setProduct(product)
-    }, [product])
+        if (id) {
+            fetchProduct();
+        }
+    }, [id]);
+
+
+
 
 
     const [loading, setLoading] = useState(false);
@@ -35,7 +43,14 @@ function ProductDetailPage() {
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('description');
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [isWishlisted, setIsWishlisted] = useState(false);
+
+    const [isWishlisted, setIsWishlisted] = useState((user?.wishlist?.includes(product?._id)));
+    useEffect(() => {
+        if (user && product) {
+            setIsWishlisted(user.wishlist?.includes(product._id));
+        }
+    }, [user?.wishlist, product?._id]);
+    const [showTryOnModal, setShowTryOnModal] = useState(false);
 
     if (!product) {
         return (
@@ -67,7 +82,6 @@ function ProductDetailPage() {
             console.log("Image : ", productImgRes);
             console.log("Index : ", currentImageIndex);
 
-
             const productBlob = await productImgRes.blob();
             formData.append("garm_img", new File([productBlob], "product.jpg", { type: "image/jpeg" }));
 
@@ -78,20 +92,47 @@ function ProductDetailPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || "Something went wrong");
             setTryOnResult(data.result[0]?.image);
+            setShowTryOnModal(true);
         } catch (err) {
             setError(err.message || "Try-On failed");
         } finally {
             setLoading(false);
         }
     };
+    const handleToggleWishlist = async () => {
+        try {
+            await toggleWishlist(product._id);
+            setIsWishlisted(prev => !prev);
+        } catch (err) {
+            console.error('Failed to toggle wishlist', err);
+        }
+    };
+
+
 
     const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
     const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
 
     const discountPercentage = Math.round(((product.price - product.discountedPrice) / product.price) * 100);
 
-    const totalRating = product.reviews.reduce((cur, next) => cur + next.rating, 0);
-    const averageRating = totalRating / product.reviews.length
+    const averageRating =
+        product.reviews?.reduce((sum, r) => sum + r.rating, 0) /
+        (product.reviews?.length || 1) || 0;
+
+
+    const formatDate = (date) => {
+        return new Date(date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
+    const renderStars = (rating) => {
+        return [...Array(5)].map((_, i) => (
+            <Star key={i} size={14} className={`${i < rating ? 'text-yellow-400 fill-current' : 'text-slate-300'}`} />
+        ));
+    };
 
     return (
         <div className="flex min-h-screen bg-slate-50">
@@ -110,10 +151,11 @@ function ProductDetailPage() {
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <button onClick={() => setIsWishlisted(!isWishlisted)}
-                                className={`p-2 rounded-xl cursor-pointer ${isWishlisted ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600'}`}>
-                                <Heart size={20} className={isWishlisted ? 'fill-current' : ''} />
+                            <button onClick={handleToggleWishlist}
+                                className={`p-2 rounded-xl cursor-pointer ${(user?.wishlist?.includes(product._id)) ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600'}`}>
+                                <Heart size={20} className={(user?.wishlist?.includes(product._id)) ? 'fill-current' : ''} />
                             </button>
+
                             <button className="p-2 cursor-pointer bg-slate-100 rounded-xl hover:bg-slate-200">
                                 <Share2 size={20} />
                             </button>
@@ -162,10 +204,10 @@ function ProductDetailPage() {
                                     <button
                                         key={index}
                                         onClick={() => {
+
                                             setCurrentImageIndex(index);
                                             setSelectedColor(product.colors[index])
                                             console.log("Selected Color in button of img", selectedColor);
-
                                         }}
                                         className={`w-20 h-20 rounded-xl overflow-hidden border-2 ${currentImageIndex === index ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-slate-200'}`}
                                     >
@@ -187,7 +229,7 @@ function ProductDetailPage() {
                                 {[...Array(5)].map((_, i) => (
                                     <Star key={i} size={16} className={`${i < Math.round(averageRating) ? 'text-yellow-400 fill-current' : 'text-slate-300'}`} />
                                 ))}
-                                <span className="text-sm text-slate-600">{averageRating} ({product.reviews.length} reviews)</span>
+                                <span className="text-sm text-slate-600">{averageRating.toFixed(1)} ({product.reviews.length} reviews)</span>
                             </div>
 
                             <div className="flex items-center space-x-3">
@@ -264,9 +306,7 @@ function ProductDetailPage() {
                                 <div className="grid grid-cols-2 gap-3">
                                     <button className="bg-slate-800 text-white py-3 px-6 rounded-xl cursor-pointer"
                                         onClick={() => {
-
                                             addToCart({ ...product, color: selectedColor, image: product.images[currentImageIndex], size: selectedSize });
-
                                         }}>Add to Cart</button>
                                     <button className="bg-slate-100 text-slate-700 py-3 px-6 rounded-xl cursor-pointer"
                                         onClick={() => {
@@ -308,19 +348,168 @@ function ProductDetailPage() {
                         </div>
                     </div>
 
-                    {/* Try-On Result */}
-                    {tryOnResult && (
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 bg-white rounded-2xl p-6 shadow-lg">
-                            <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center space-x-2">
-                                <Zap className="text-indigo-600" />
-                                <span>Virtual Try-On Result</span>
-                            </h2>
-                            <div className="flex justify-center">
-                                <img src={tryOnResult} alt="Try-On Result" className="max-w-md w-full rounded-xl shadow-md" />
-                            </div>
+                    {/* Tabs Section */}
+                    <div className="mt-12 bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div className="flex border-b border-slate-200">
+                            <button
+                                onClick={() => setActiveTab('description')}
+                                className={`flex-1 py-4 px-6 text-sm font-medium ${activeTab === 'description' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-600 hover:text-slate-900'}`}
+                            >
+                                Description
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('reviews')}
+                                className={`flex-1 py-4 px-6 text-sm font-medium ${activeTab === 'reviews' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-600 hover:text-slate-900'}`}
+                            >
+                                Reviews ({product.reviews.length})
+                            </button>
+                        </div>
+
+                        <div className="p-6">
+                            {activeTab === 'description' && (
+                                <div className="space-y-4">
+                                    <p className="text-slate-700 leading-relaxed">{product.description}</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                        <div className="space-y-2">
+                                            <h4 className="font-medium text-slate-800">Material</h4>
+                                            <p className="text-sm text-slate-600">{product.material || 'Premium Quality Cotton'}</p>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h4 className="font-medium text-slate-800">Care Instructions</h4>
+                                            <p className="text-sm text-slate-600">Machine wash cold, tumble dry low</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'reviews' && (
+                                <div className="space-y-6">
+                                    {/* Review Summary */}
+                                    <div className="bg-slate-50 rounded-xl p-4">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center space-x-2">
+                                                <span className="text-3xl font-bold text-slate-800">{averageRating.toFixed(1)}</span>
+                                                <div className="flex items-center space-x-1">
+                                                    {renderStars(Math.round(averageRating))}
+                                                </div>
+                                            </div>
+                                            <span className="text-sm text-slate-600">{product.reviews.length} reviews</span>
+                                        </div>
+
+                                        {/* Rating Distribution */}
+                                        <div className="space-y-2">
+                                            {[5, 4, 3, 2, 1].map((rating) => {
+                                                const count = product.reviews.filter(review => review.rating === rating).length;
+                                                const percentage = (count / product.reviews.length) * 100;
+                                                return (
+                                                    <div key={rating} className="flex items-center space-x-2">
+                                                        <span className="text-sm text-slate-600">{rating}</span>
+                                                        <Star size={12} className="text-yellow-400 fill-current" />
+                                                        <div className="flex-1 bg-slate-200 rounded-full h-2">
+                                                            <div
+                                                                className="bg-yellow-400 h-2 rounded-full"
+                                                                style={{ width: `${percentage}%` }}
+                                                            ></div>
+                                                        </div>
+                                                        <span className="text-sm text-slate-600">{count}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Individual Reviews */}
+                                    <div className="space-y-4">
+                                        {product.reviews.map((review, index) => (
+                                            <div key={index} className="border border-slate-200 rounded-xl p-4">
+                                                <div className="flex items-start space-x-3">
+                                                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                                                        <User size={20} className="text-indigo-600" />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <div className="flex items-center space-x-2">
+                                                                <span className="font-medium text-slate-800">{review.user?.name || 'Anonymous User'}</span>
+                                                                <div className="flex items-center space-x-1">
+                                                                    {renderStars(review.rating)}
+                                                                </div>
+                                                            </div>
+                                                            <span className="text-sm text-slate-500">{formatDate(review.date)}</span>
+                                                        </div>
+                                                        {review.comment && (
+                                                            <p className="text-slate-700 text-sm leading-relaxed">{review.comment}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Virtual Try-On Modal */}
+                <AnimatePresence>
+                    {showTryOnModal && tryOnResult && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+                            onClick={() => setShowTryOnModal(false)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.8, opacity: 0 }}
+                                className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="flex items-center justify-between mb-4">
+                                    <h2 className="text-xl font-bold text-slate-800 flex items-center space-x-2">
+                                        <Sparkles className="text-indigo-600" size={24} />
+                                        <span>Virtual Try-On Result</span>
+                                    </h2>
+                                    <button
+                                        onClick={() => setShowTryOnModal(false)}
+                                        className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                                    >
+                                        <X size={20} className="text-slate-600" />
+                                    </button>
+                                </div>
+                                <div className="flex justify-center">
+                                    <img
+                                        src={tryOnResult}
+                                        alt="Virtual Try-On Result"
+                                        className="w-full rounded-xl shadow-lg"
+                                    />
+                                </div>
+                                <div className="mt-4 flex space-x-3">
+                                    <button
+                                        onClick={() => setShowTryOnModal(false)}
+                                        className="flex-1 bg-slate-100 text-slate-700 py-2 px-4 rounded-xl hover:bg-slate-200 transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            // Add download functionality here
+                                            const link = document.createElement('a');
+                                            link.href = tryOnResult;
+                                            link.download = 'virtual-tryon-result.jpg';
+                                            link.click();
+                                        }}
+                                        className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-xl hover:bg-indigo-700 transition-colors"
+                                    >
+                                        Download
+                                    </button>
+                                </div>
+                            </motion.div>
                         </motion.div>
                     )}
-                </div>
+                </AnimatePresence>
             </div>
         </div>
     );

@@ -1,10 +1,12 @@
 import { Order } from "../models/orders.model.js";
 import { Product } from "../models/product.model.js";
+import { User } from "../models/user.model.js";
+import mongoose from "mongoose";
 
 export const getProducts = async (req, res) => {
     try {
         const products = await Product.find({}).populate("seller", "name store.name store.logo")
-        console.log(products);
+        // console.log(products);
 
         res.status(200).json({ message: "Prod fetch Successful", success: true, products })
     } catch (error) {
@@ -99,6 +101,7 @@ export const reviewProduct = async (req, res) => {
             { new: true }
         );
 
+
         if (!product) {
             product = await Product.findOneAndUpdate(
                 { _id: prodId },
@@ -133,3 +136,92 @@ const updateProdData = async (item, id) => {
 }
 
 
+// export const toggleWishlist = async (req, res) => {
+//     const id = req.userId;
+//     const { prodId } = req.body;
+
+//     try {
+//         const productExists = await Product.exists({ _id: prodId });
+//         if (!productExists) {
+//             return res.status(404).json({ success: false, message: 'Product not found.' });
+//         }
+
+//         const getUser = await User.findById(id);
+//         if (!user) {
+//             return res.status(404).json({ success: false, message: 'User not found.' });
+//         }
+
+//         const wishProd = getUser.wishlist?.find((prod) => prod._id === prodId);
+//         if (!wishlist) {
+//             getUser.wishlist.push({ prodId });
+//             getUser.save();
+//             return res.status(200).json({ success: true, message: "Added to Wishlist" })
+//         }
+//         const updatedProd = getUser.wishlist?.map((itms) => itms._id != prodId);
+//         getUser.wishlist = updatedProd;
+//         getUser.save();
+//         return res.status(200).json({ success: true, message: "Removed From the Wishlist" })
+
+
+//     } catch (error) {
+//         console.log("Error in toggle wishlist", message.error);
+//         res.status(500).json({ success: false, message: error.message })
+
+//     }
+// }
+
+
+export const toggleWishlist = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { prodId } = req.body;
+        console.log(userId);
+
+
+
+        console.log("Helu");
+
+
+        if (!prodId) {
+            return res.status(400).json({ success: false, message: 'Invalid product id.' });
+        }
+
+        const productExists = await Product.exists({ _id: prodId });
+        if (!productExists) {
+            return res.status(404).json({ success: false, message: 'Product not found.' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        const alreadyInWishlist = user.wishlist.some(id => id.equals(prodId));
+
+        let updatedUser;
+        if (alreadyInWishlist) {
+            updatedUser = await User.findByIdAndUpdate(
+                userId,
+                { $pull: { wishlist: prodId } },
+                { new: true }
+            );
+            console.log("Removed");
+
+
+            return res.status(200).json({ success: true, message: 'Removed from wishlist.', updatedUser });
+        } else {
+            updatedUser = await User.findByIdAndUpdate(
+                userId,
+                { $addToSet: { wishlist: prodId } },
+                { new: true }
+            );
+            console.log("Added");
+
+
+            return res.status(200).json({ success: true, message: 'Added to wishlist.', updatedUser });
+        }
+    } catch (error) {
+        console.error('Error in toggleWishlist:', error.message);
+        res.status(500).json({ success: false, message: 'Server error.' });
+    }
+};

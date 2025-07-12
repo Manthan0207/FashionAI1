@@ -292,7 +292,6 @@ function AllOrderPage() {
 
 
         useEffect(() => {
-            console.log(prods);
             setReviewText(matchedProd.comment);
             setRating(matchedProd.rating);
         }

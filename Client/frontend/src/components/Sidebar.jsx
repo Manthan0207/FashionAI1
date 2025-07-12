@@ -42,7 +42,7 @@ const Sidebar = () => {
         { icon: Home, label: "Dashboard", path: "/" },
         { icon: ShoppingBag, label: "Collections", path: "/collections" },
         { icon: TrendingUp, label: "Trending", path: "/trending" },
-        { icon: Heart, label: "Favorites", path: "/favorites" },
+        { icon: Heart, label: "Wishlists", path: "/wishlist" },
         { icon: Star, label: "Featured", path: "/featured" },
         { icon: Search, label: "Discover", path: "/discover" },
         { icon: User, label: "Profile", path: "/profile" },

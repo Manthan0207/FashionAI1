@@ -98,6 +98,8 @@ const userSchema = new mongoose.Schema(
             contactPhone: { type: String, default: "" },
             location: { type: String, default: "" }
         },
+        wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+
         isSeller: { type: Boolean, default: false },
         sellerSince: { type: Date, default: Date.now() },
         approvalStatus: {
