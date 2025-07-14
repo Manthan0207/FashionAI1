@@ -21,14 +21,29 @@ const Dashboard = () => {
     const navigate = useNavigate()
 
     // Get unique categories from products (using gender as category)
-    const categories = ["All", ...new Set(prods?.map(product => product.gender) || [])]
+    const categories = ["All", ...new Set(prods?.map(product => product.gender) || [])];
+
+    const tokens = searchTerm.trim().toLowerCase().split(/\s+/);      // ["cotton", "shirt"]
+    const hasSearch = tokens[0] !== "";                            // true if user typed something
+
+
 
     // Filter products based on search and category
-    const filteredClothes = prods?.filter(
-        (item) =>
-            (activeCategory === "All" || item.gender === activeCategory) &&
-            item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    ) || []
+    const filteredClothes =
+        prods?.filter((item) => {
+            // 1️⃣ category check
+            if (activeCategory !== "All" && item.gender !== activeCategory) return false;
+
+            // 2️⃣ search check
+            if (!hasSearch) return true; // nothing typed → keep item
+
+            return tokens.every((token) =>
+                item.name.toLowerCase().includes(token) ||
+                item.material.toLowerCase().includes(token) ||
+                item.gender.toLowerCase().includes(token) ||
+                item.colors?.some((c) => c.toLowerCase().includes(token))
+            );
+        }) || [];
 
     // Calculate stats from real data
     const stats = {
@@ -115,29 +130,7 @@ const Dashboard = () => {
             <Sidebar />
 
             <div className="flex-1 w-full transition-all duration-300 lg:ml-20">
-                {/* Header */}
-                {/* <header className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
-                    <div className="px-6 py-4">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <h1 className="text-2xl font-bold text-slate-800">Fashion Collection</h1>
-                                <p className="text-slate-600">Discover your perfect style ({stats.totalItems} items)</p>
-                            </div>
 
-                            {/* Search Bar }
-                            <div className="relative w-full md:w-96">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" size={20} />
-                                <input
-                                    type="text"
-                                    placeholder="Search for clothes..."
-                                    className="w-full pl-10 pr-4 py-3 bg-slate-100 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-200 text-slate-700 placeholder-slate-500"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </header> */}
                 <header className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
                     <div className="px-6 py-4">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -315,8 +308,8 @@ const Dashboard = () => {
                                     <div className="flex items-center space-x-1 mb-2">
                                         <Star size={14} className="text-yellow-400 fill-current" />
                                         <span className="text-sm text-slate-600">
-                                            {item.ratings?.length > 0
-                                                ? (item.ratings.reduce((sum, rating) => sum + rating.rating, 0) / item.ratings.length).toFixed(1)
+                                            {item.reviews?.length > 0
+                                                ? (item.reviews.reduce((sum, rew) => sum + rew.rating, 0) / item.reviews.length).toFixed(1)
                                                 : '0'
                                             }
                                         </span>

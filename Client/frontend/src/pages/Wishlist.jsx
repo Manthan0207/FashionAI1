@@ -254,9 +254,9 @@ const Wishlist = () => {
                                             <button
                                                 className="flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 active:bg-gray-900 transition-colors duration-200 shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-400"
                                                 disabled={item.stock === 0}
+
                                                 onClick={() => {
-                                                    addToCart(item);
-                                                    toast.success("Item Added To Cart");
+                                                    addToCart({ ...item, color: item.colors[0], image: item.images[0], size: item.sizesAvailable[0] });
                                                 }}
                                             >
                                                 <ShoppingCart size={18} />
