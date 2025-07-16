@@ -254,6 +254,7 @@ export const saveOnboardData = async (req, res) => {
         }
         const response = await cloudinary.uploader.upload(image);
 
+
         const normalizedRange = ageRange.replace(/[–-]/, '-');
         const [minAge, maxAge] = normalizedRange.split('-').map(Number);
 
@@ -269,7 +270,13 @@ export const saveOnboardData = async (req, res) => {
             preferredClothingStyle,
             favColor,
             fitType,
-            address
+            address,
+            $push: {
+                notifications: {
+                    message: `🎉 You’ve successfully completed onboarding!`,
+                    msgType: "admin"
+                }
+            }
         }, { new: true })
 
         return res.status(200).json({
@@ -337,3 +344,30 @@ export const getSalesData = async (req, res) => {
     }
 }
 
+
+
+export const markNotificationRead = async (req, res) => {
+    const id = req.userId;
+
+    if (!id) {
+        return res.status(404).json({ success: false, message: "No User Id Found" })
+    }
+    try {
+
+        const updateUser = await User.findByIdAndUpdate(id,
+            {
+                $set: {
+                    "notifications.$[elem].isRead": true
+                }
+            },
+            {
+                arrayFilters: [{ "elem.isRead": false }],
+                new: true
+            }
+        );
+        res.status(200).json({ success: true, message: "All marked as read", updateUser });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ success: false, message: "Error in markNotificationRead" })
+    }
+}

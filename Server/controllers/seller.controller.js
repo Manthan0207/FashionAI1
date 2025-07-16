@@ -21,10 +21,18 @@ export const becomeSeller = async (req, res) => {
                 isSeller: true,
                 store: { name, description, logo: response.secure_url, contactEmail, contactPhone, location },
                 sellerSince: Date.now(),
-                approvalStatus: "approved"
+                approvalStatus: "approved",
+                $push: {
+                    notifications: {
+                        message: `Congratulations ${name} on becoming a seller!`,
+                        msgType: "admin",
+
+                    }
+                }
             },
             { new: true }
-        )
+        );
+
 
         return res.status(200).json({
             success: true,

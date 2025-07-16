@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes.detect import router as detect_router 
 from routes.virtual_tryon import router as viton_router
 from routes.cloth_seg import router as cloth_seg
+from routes.cloth_reccomandation import router as recommend
 
 app = FastAPI()
 
@@ -25,3 +26,4 @@ app.add_middleware(
 app.include_router(detect_router, prefix="/api")
 app.include_router(viton_router , prefix="/api")
 app.include_router(cloth_seg , prefix="/api")
+app.include_router(recommend , prefix="/api")

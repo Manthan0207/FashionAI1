@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 export const getProducts = async (req, res) => {
     try {
         const products = await Product.find({}).populate("seller", "name store.name store.logo")
-        // console.log(products);
+        console.log(products);
 
         res.status(200).json({ message: "Prod fetch Successful", success: true, products })
     } catch (error) {
@@ -37,7 +37,21 @@ export const placeOrder = async (req, res) => {
         );
 
 
-        await orders.save()
+
+        await orders.save();
+
+        const user = await User.findById(id);
+        const itemNames = data.items.map(item => item.name).join(", ");
+
+
+
+
+        user.notifications.push({
+            message: `Order placed.`,
+            msgType: "order",
+        })
+        user.save();
+
         res.status(200).json({ success: true, message: "Order Placed Successfully", orders: orders })
     } catch (error) {
         console.log("error in the placeOrder");
@@ -120,6 +134,13 @@ export const reviewProduct = async (req, res) => {
         }
 
         const allProd = await Product.find({});
+        const user = await User.findById(userId);
+
+        user.notifications.push({
+            message: `You reviewed ${product.name}`,
+            msgType: "review"
+        });
+        await user.save();
 
 
         res.status(200).json({ success: true, message: "Review Submitted", product, allProd })

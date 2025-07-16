@@ -1,22 +1,117 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import Sidebar from '../components/Sidebar'
-import { Search, Filter, Heart, ShoppingCart, Star, Eye, TrendingUp, Zap, Loader2 } from "lucide-react"
+import { Search, Filter, Heart, ShoppingCart, Star, Eye, TrendingUp, Zap, Loader2, Bell, X } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuthStore } from "../store/authStore"
 import { useCartStore } from "../store/cartStore"
 import toast from "react-hot-toast"
+// import NotificationModal from "../components/NotificationModal"
+
+
+
+
+const NotificationDropdown = ({ notifications, onMarkAsRead, onClose }) => {
+    // Sort notifications by date (newest first)
+    const sortedNotifications = [...notifications].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 z-50"
+        >
+            <div className="p-4 border-b border-slate-200">
+                <div className="flex justify-between items-center">
+                    <h3 className="font-bold text-slate-800">Notifications</h3>
+                    <button
+                        onClick={() => {
+                            // Mark all as read
+                            notifications.forEach(notif => {
+                                if (!notif.isRead) {
+                                    onMarkAsRead(notif);
+                                }
+                            });
+                        }}
+                        className="text-sm text-indigo-600 hover:text-indigo-800"
+                    >
+                        Mark all as read
+                    </button>
+                </div>
+            </div>
+
+            <div className="max-h-96 overflow-y-auto">
+                {sortedNotifications.length === 0 ? (
+                    <div className="text-center py-8 text-slate-500">
+                        No notifications
+                    </div>
+                ) : (
+                    sortedNotifications.map(notification => (
+                        <div
+                            key={notification._id || notification.createdAt}
+                            className={`p-4 border-b border-slate-100 ${!notification.isRead ? 'bg-blue-50' : ''}`}
+                        >
+                            <div className="flex items-start gap-3">
+                                <div className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${!notification.isRead ? 'bg-blue-500' : 'bg-transparent'}`} />
+                                <div className="flex-1">
+                                    <p className="text-sm font-medium text-slate-800">{notification.message}</p>
+                                    <div className="flex justify-between items-center mt-2">
+                                        <span className="text-xs text-slate-500">
+                                            {new Date(notification.createdAt).toLocaleString()}
+                                        </span>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            <div className="p-4 text-center border-t border-slate-200">
+                <button
+                    onClick={onClose}
+                    className="text-sm text-indigo-600 hover:text-indigo-800"
+                >
+                    Close
+                </button>
+            </div>
+        </motion.div>
+    );
+};
 
 
 const Dashboard = () => {
     const [searchTerm, setSearchTerm] = useState("")
     const [activeCategory, setActiveCategory] = useState("All")
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
 
-    const { getProducts, prods, toggleWishlist } = useAuthStore()
+    const { getProducts, prods, toggleWishlist, markNotificationRead } = useAuthStore()
     const { cart, addToCart } = useCartStore()
 
     const { user } = useAuthStore()
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = async (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowNotifications(false);
+                await markNotificationRead();
+
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const navigate = useNavigate()
 
@@ -68,6 +163,7 @@ const Dashboard = () => {
         },
     }
 
+
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
         visible: {
@@ -79,8 +175,19 @@ const Dashboard = () => {
             },
         },
     }
+    const handleNotificationMark = async () => {
+
+        setShowNotifications();
+        await markNotificationRead();
+
+    }
 
     useEffect(() => {
+        if (user?.notifications) {
+            setNotifications(user.notifications);
+            const unread = user.notifications.filter(n => !n.isRead).length;
+            setUnreadCount(unread);
+        }
         const fetchProducts = async () => {
             setLoading(true)
             console.log("Getting");
@@ -94,7 +201,7 @@ const Dashboard = () => {
         } else {
             setLoading(false)
         }
-    }, [getProducts, prods])
+    }, [getProducts, prods, user])
 
     useEffect(() => {
         if (prods && prods.length > 0) {
@@ -162,6 +269,28 @@ const Dashboard = () => {
                                         </span>
                                     )}
                                 </button>
+                                {/* Add relative container and dropdown toggle */}
+                                <div className="relative" ref={dropdownRef}>
+                                    <button
+                                        onClick={() => { setShowNotifications(!showNotifications) }}
+                                        className="relative flex items-center justify-center p-2 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors"
+                                    >
+                                        <Bell size={22} className="text-slate-700" />
+                                        {unreadCount > 0 && (
+                                            <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-semibold leading-none text-white bg-red-500 rounded-full">
+                                                {unreadCount}
+                                            </span>
+                                        )}
+                                    </button>
+
+                                    {/* Notification Dropdown */}
+                                    {showNotifications && (
+                                        <NotificationDropdown
+                                            notifications={notifications}
+                                            onClose={handleNotificationMark}
+                                        />
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -265,6 +394,8 @@ const Dashboard = () => {
                                     <div className="absolute top-3 left-3 flex flex-col space-y-2">
                                         {/* New Badge - if created within 30 days */}
                                         {(() => {
+                                            console.log("Item : ", item);
+
                                             const createdDate = new Date(item.createdAt);
                                             const thirtyDaysAgo = new Date();
                                             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -423,6 +554,8 @@ const Dashboard = () => {
                             <p className="text-slate-600">Products will appear here once they are loaded</p>
                         </div>
                     )}
+
+
                 </main>
             </div>
         </div>

@@ -293,6 +293,18 @@ export const useAuthStore = create(
                     }
 
 
+                },
+                markNotificationRead: async () => {
+                    set({ isLoading: true, error: null, message: null });
+                    try {
+                        const response = await axios.put(`${API_URL}/api/auth/mark-notification-read`);
+
+                        set({ isLoading: false, error: null, message: response.data.message, user: response.data.updateUser });
+                    } catch (error) {
+                        set({ isLoading: false, error: error?.response?.data?.message || "Something went wrong while making notification read" });
+                        throw error;
+                    }
+
                 }
 
             }

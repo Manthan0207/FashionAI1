@@ -175,18 +175,20 @@ function AllOrderPage() {
 
 
         try {
+            setShowReviewModal(false);
+            setSelectedItemForReview(null);
             await reviewProduct(data);
 
-            // Close modal and reset selected item
+            toast.success("Review submitted successfully!");
+
+
+
+        } catch (error) {
+            toast.error("Please try again")
+
             setShowReviewModal(false);
             setSelectedItemForReview(null);
 
-            // Show success message
-            toast.success("Review submitted successfully!");
-        } catch (error) {
-            setShowReviewModal(false);
-            setSelectedItemForReview(null);
-            toast.error("Please try again")
         }
     };
 
@@ -273,7 +275,6 @@ function AllOrderPage() {
         const [reviewText, setReviewText] = useState("");
         console.log("Item :", item);
         console.log(typeof item);
-        console.log("ProdId ", typeof item, item.productId);
         console.log("ProdId in prods ", typeof prods[0]._id, prods[0]._id);
 
         console.log("UserId ", typeof user._id);
@@ -292,13 +293,15 @@ function AllOrderPage() {
 
 
         useEffect(() => {
-            setReviewText(matchedProd.comment);
-            setRating(matchedProd.rating);
+            if (matchedProd) {
+                setReviewText(matchedProd.comment);
+                setRating(matchedProd.rating);
+            }
         }
             , []);
         if (!item) return null;
 
-        const handleSubmit = () => {
+        const handleSubmit = async () => {
             onSubmit(item, rating, reviewText);
             // Reset local state after submission
             setRating(0);

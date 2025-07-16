@@ -106,7 +106,15 @@ const userSchema = new mongoose.Schema(
             type: String,
             enum: ["pending", "approved", "rejected"],
             default: "approved"
-        }
+        },
+        notifications: [
+            {
+                message: { type: String, required: true },
+                isRead: { type: Boolean, default: false },
+                msgType: { type: String, enum: ["order", "purchase", "wishlist", "review", "admin"], required: true },
+                createdAt: { type: Date, default: Date.now }
+            }
+        ]
 
     }, { timestamps: true })
 

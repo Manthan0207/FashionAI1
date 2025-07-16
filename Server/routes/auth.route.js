@@ -1,5 +1,5 @@
 import express from 'express'
-import { signup, login, getSalesData, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, saveUserImage, saveOnboardData } from '../controllers/auth.controller.js'
+import { signup, login, getSalesData, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, saveUserImage, saveOnboardData, markNotificationRead } from '../controllers/auth.controller.js'
 import { verifyToken } from '../middleware/verifyToken.js'
 
 const app = express()
@@ -25,6 +25,8 @@ router.put('/save-user-image', verifyToken, saveUserImage)
 router.put('/save-onboarding-data', verifyToken, saveOnboardData)
 
 router.get('/seller-data', verifyToken, getSalesData)
+
+router.put('/mark-notification-read', verifyToken, markNotificationRead)
 
 
 
