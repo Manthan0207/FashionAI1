@@ -1,10 +1,12 @@
+import axios from "axios";
 import { Order } from "../models/orders.model.js";
 import { Product } from "../models/product.model.js";
 import { User } from "../models/user.model.js";
-import mongoose from "mongoose";
 
 export const getProducts = async (req, res) => {
+    const userId = req.userId;
     try {
+
         const products = await Product.find({}).populate("seller", "name store.name store.logo")
         console.log(products);
 
@@ -15,6 +17,108 @@ export const getProducts = async (req, res) => {
 
     }
 }
+
+
+
+// export const getProducts = async (req, res) => {
+//     console.log("Hi");
+
+//     const userId = req.userId;
+
+//     try {
+//         // Get all active products
+//         const products = await Product.find({ isActive: true }).populate("seller", "name store.name store.logo").lean();
+
+//         // If no user logged in, just return all
+//         if (!userId) {
+//             return res.status(200).json({
+//                 success: true,
+//                 message: "All products (no personalization)",
+//                 products
+//             });
+//         }
+
+//         // Fetch user
+//         const user = await User.findById(userId);
+//         if (!user) {
+//             return res.status(200).json({
+//                 success: true,
+//                 message: "User not found, returning all products",
+//                 products
+//             });
+//         }
+
+//         // Format user for FastAPI
+//         const userData = {
+//             gender: user.gender,
+//             ageRange: user.ageRange,
+//             preferredStyle: user.preferredClothingStyle || [],
+//             favoriteColors: user.favColor || [],
+//             fitType: user.fitType || "",
+//             bodyType: user.bodyType || "",
+//             positiveProductIds: user.wishlist || [],// Optional: Fill from wishlist/order/review ,
+//             skintone: user.skintone || ""
+//         };
+
+//         console.log("User Data to fapi : ", userData);
+
+
+
+//         // Format products for FastAPI
+//         const prodData = products.map((p) => ({
+//             id: p._id.toString(),
+//             name: p.name,
+//             styleTags: p.styleTags,
+//             colors: p.colors,
+//             fitType: p.fitType,
+//             gender: p.gender,
+//             ageRange: p.ageRange,
+//             material: p.material,
+//             price: p.discountedPrice !== -1 ? p.discountedPrice : p.price
+//         }));
+
+//         // 🔁 Call FastAPI recommender
+//         const response = await axios.post("http://localhost:8000/api/recommend", {
+//             userData,
+//             prodData
+//         });
+
+//         const { recommendations, explanations } = response.data;
+//         console.log("Rec : ", recommendations);
+
+//         console.log("exp : ", explanations);
+
+
+//         const recommendedIds = response.data.recommendations.map(rec => rec.id);
+
+//         // 2. Maintain order of IDs for final sort
+//         const orderMap = Object.fromEntries(recommendedIds.map((id, index) => [id, index]));
+
+//         // 3. Filter original Mongo products
+//         const recommendedFullProds = products.filter(p => recommendedIds.includes(p._id.toString()));
+
+//         // 4. Sort according to FastAPI order
+//         const sortedProds = recommendedFullProds.sort((a, b) =>
+//             orderMap[a._id.toString()] - orderMap[b._id.toString()]
+//         );
+
+
+//         return res.status(200).json({
+//             success: true,
+//             message: "Personalized recommendations fetched",
+//             products: sortedProds,
+//             explanations // optional for UI
+//         });
+
+//     } catch (error) {
+//         console.log("Error in getProducts", error);
+//         return res.status(500).json({
+//             success: false,
+//             message: "Error fetching products"
+//         });
+//     }
+// };
+
 
 export const placeOrder = async (req, res) => {
     const data = req.body

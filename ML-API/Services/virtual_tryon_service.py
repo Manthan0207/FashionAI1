@@ -7,7 +7,16 @@ import base64
 from fastapi import UploadFile, HTTPException
 from gradio_client import Client, handle_file
 
-client = Client("BoyuanJiang/FitDiT")  # Initialized once
+# client = Client("BoyuanJiang/FitDiT")  # Initialized once
+def get_viton_client():
+    from gradio_client import Client
+    try:
+        return Client("BoyuanJiang/FitDiT")
+    except Exception as e:
+        print(f"[VITON Error] Could not load Hugging Face Client: {e}")
+        return None
+client = get_viton_client()
+
 
 def save_upload_file_tmp(upload_file: UploadFile) -> str:
     suffix = os.path.splitext(upload_file.filename)[-1]

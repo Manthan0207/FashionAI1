@@ -107,6 +107,10 @@ const userSchema = new mongoose.Schema(
             enum: ["pending", "approved", "rejected"],
             default: "approved"
         },
+        skintone: {
+            type: String,
+            default: ""
+        },
         notifications: [
             {
                 message: { type: String, required: true },

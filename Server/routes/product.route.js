@@ -7,7 +7,7 @@ const app = express();
 const route = express.Router();
 
 
-route.get('/get-products', getProducts)
+route.get('/get-products', verifyToken, getProducts)
 route.post('/place-order', verifyToken, placeOrder)
 route.get('/get-all-orders', verifyToken, getAllOrders)
 route.put('/change-product-status', changeProductStatus)

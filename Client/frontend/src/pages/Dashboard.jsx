@@ -95,14 +95,17 @@ const Dashboard = () => {
     const { getProducts, prods, toggleWishlist, markNotificationRead } = useAuthStore()
     const { cart, addToCart } = useCartStore()
 
-    const { user } = useAuthStore()
+    const { user, isLoading } = useAuthStore()
     const dropdownRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = async (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            if (showNotifications && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setShowNotifications(false);
                 await markNotificationRead();
+                const updated = notifications.map(n => ({ ...n, isRead: true }));
+                setNotifications(updated);
+                setUnreadCount(0);
 
             }
         };
@@ -111,7 +114,7 @@ const Dashboard = () => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);
+    }, [showNotifications]);
 
     const navigate = useNavigate()
 
@@ -179,8 +182,13 @@ const Dashboard = () => {
 
         setShowNotifications();
         await markNotificationRead();
+        const updated = notifications.map(n => ({ ...n, isRead: true }));
+        setNotifications(updated);
+        setUnreadCount(0);
 
     }
+
+    const hasFetched = useRef(false);
 
     useEffect(() => {
         if (user?.notifications) {
@@ -188,21 +196,21 @@ const Dashboard = () => {
             const unread = user.notifications.filter(n => !n.isRead).length;
             setUnreadCount(unread);
         }
+
         const fetchProducts = async () => {
-            setLoading(true)
             console.log("Getting");
+            await getProducts();
+            // setLoading(false);
+        };
 
-            await getProducts()
-            setLoading(false)
-        }
-
-        if (!prods || prods.length === 0) {
-            fetchProducts()
+        // Add this check
+        if ((!prods || prods.length === 0) && !hasFetched.current) {
+            hasFetched.current = true; // Mark as fetched
+            fetchProducts();
         } else {
-            setLoading(false)
+            // setLoading(false);
         }
-    }, [getProducts, prods, user])
-
+    }, [getProducts, prods]); // Keep dependencies
     useEffect(() => {
         if (prods && prods.length > 0) {
             console.log("Updated products from store:", prods);
@@ -218,7 +226,7 @@ const Dashboard = () => {
     };
 
 
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="flex min-h-screen bg-slate-50">
                 <Sidebar />

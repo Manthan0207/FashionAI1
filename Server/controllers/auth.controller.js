@@ -247,11 +247,12 @@ export const saveUserImage = async (req, res) => {
 export const saveOnboardData = async (req, res) => {
     try {
 
-        const { image, phone, address, bodyType, goals, gender, ageRange, preferredClothingStyle, favColor, fitType } = req.body;
+        const { image, phone, address, bodyType, goals, gender, ageRange, preferredClothingStyle, favColor, fitType, skintone } = req.body;
         const userId = req.userId;
         if (!image) {
             res.status(400).json({ success: false, message: "Profile Pic is required" })
         }
+        console.log('Cloudinary Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME);
         const response = await cloudinary.uploader.upload(image);
 
 
@@ -271,6 +272,7 @@ export const saveOnboardData = async (req, res) => {
             favColor,
             fitType,
             address,
+            skintone,
             $push: {
                 notifications: {
                     message: `🎉 You’ve successfully completed onboarding!`,

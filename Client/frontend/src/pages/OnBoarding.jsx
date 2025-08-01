@@ -27,6 +27,7 @@ const Onboarding = () => {
     const [state, setState] = useState("");
     const [zip, setZip] = useState("");
     const [country, setCountry] = useState("India");
+    const [skintone, setSkintone] = useState("")
 
     const navigate = useNavigate();
 
@@ -104,6 +105,7 @@ const Onboarding = () => {
             const data = await response.json();
 
             if (data.faceDetected && data.bodyDetected && data.skintone) {
+                setSkintone(data.skintone)
                 setStep(3);
             } else {
                 alert("Please upload a clear image with your full face and body visible.");
@@ -150,6 +152,7 @@ const Onboarding = () => {
             preferredClothingStyle: selectedStyles,
             favColor: selectedColors,
             fitType: selectedFit,
+            skintone
         };
 
         await saveOnboardData(userData);
