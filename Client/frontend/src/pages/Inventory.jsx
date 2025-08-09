@@ -32,6 +32,7 @@ import { Power } from 'react-feather';
 import { toast } from 'react-hot-toast'
 import { useAuthStore } from '../store/authStore';
 import Swal from 'sweetalert2'
+import { Link } from 'react-router-dom';
 
 
 
@@ -666,10 +667,10 @@ const Inventory = () => {
                                     <span>Filters</span>
                                 </button>
 
-                                <button className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                <Link className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors" to="/upload-product">
                                     <Plus size={18} />
                                     <span>Add Product</span>
-                                </button>
+                                </Link>
                             </div>
                         </div>
 

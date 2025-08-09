@@ -91,12 +91,17 @@ function ProductDetailPage() {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || "Something went wrong");
-            setTryOnResult(data.result[0]?.image);
+            setTryOnResult(data.result[0]);
             setShowTryOnModal(true);
+            console.log(data.result);
+            console.log(data.res);
+
+
         } catch (err) {
             setError(err.message || "Try-On failed");
         } finally {
             setLoading(false);
+
         }
     };
     const handleToggleWishlist = async () => {
@@ -498,7 +503,7 @@ function ProductDetailPage() {
                                             // Add download functionality here
                                             const link = document.createElement('a');
                                             link.href = tryOnResult;
-                                            link.download = 'virtual-tryon-result.jpg';
+                                            link.download = 'virtual-tryon-result.png';
                                             link.click();
                                         }}
                                         className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-xl hover:bg-indigo-700 transition-colors"
