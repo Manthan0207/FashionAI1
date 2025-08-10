@@ -6,6 +6,7 @@ import crypto from 'crypto'
 import cloudinary from '../utils/cloudinary.config.js';
 import { Order } from '../models/orders.model.js';
 import mongoose from 'mongoose';
+import { response } from 'express';
 
 export const signup = async (req, res) => {
     const { email, password, name } = req.body;
@@ -371,5 +372,42 @@ export const markNotificationRead = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ success: false, message: "Error in markNotificationRead" })
+    }
+}
+
+export const updateUserProfile = async (req, res) => {
+    const id = req.userId;
+    if (!id) {
+        return res.status(404).json({ success: false, message: "No User Id Found" })
+    }
+    try {
+        const { image, imageChanged, name, gender, ageRange, bodyType, preferredClothingStyle, favColor, address, skintone, phone } = req.body;
+
+        if (imageChanged) {
+            const response = await cloudinary.uploader.upload(image);
+        }
+        const normalizedRange = ageRange.replace(/[–-]/, '-');
+        const [minAge, maxAge] = normalizedRange.split('-').map(Number);
+        const updateUser = await User.findByIdAndUpdate(id, {
+            $set: {
+                userImage: imageChanged ? response.secure_url : image,
+                name,
+                gender,
+                ageRange,
+                bodyType,
+                phone,
+                preferredClothingStyle,
+                favColor,
+                address,
+                skintone,
+                minAge: minAge,
+                maxAge: maxAge,
+            }
+        }, { new: true })
+        res.status(200).json({ success: true, message: "Profile Updated Successfully", user: updateUser })
+    } catch (error) {
+        console.log("Error in update user");
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+
     }
 }
