@@ -317,6 +317,34 @@ export const useAuthStore = create(
                         set({ isLoading: false, error: error?.response?.data?.message || "Something went wrong while Updating Profile" });
                         throw error;
                     }
+                },
+                changePassword: async (data) => {
+                    set({ isLoading: true, error: null, message: null });
+                    try {
+                        const response = await axios.post(`${API_URL}/api/auth/change-password`, data);
+                        set({
+                            isLoading: false,
+                            error: null,
+                            message: response.data.message
+                        });
+
+                        return {
+                            successInProcess: response.data.success,
+                            message: response.data.message
+                        };
+                    } catch (error) {
+                        const errorMessage = error?.response?.data?.message || "Error in change Password";
+                        set({
+                            isLoading: false,
+                            error: errorMessage,
+                            message: null
+                        });
+
+                        return {
+                            successInProcess: false,
+                            message: errorMessage
+                        };
+                    }
                 }
 
             }

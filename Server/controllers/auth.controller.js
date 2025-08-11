@@ -411,3 +411,40 @@ export const updateUserProfile = async (req, res) => {
 
     }
 }
+
+export const changePassword = async (req, res) => {
+    const userId = req.userId;
+    console.log(req.body);
+
+    const { currentPassword, newPassword } = req.body;
+
+    const getUser = await User.findById(userId);
+
+    if (!getUser) {
+        return res.status(404).json({ success: false, message: "User Doesn't exist" })
+    }
+
+    try {
+        const isValidPassword = await bcryptjs.compare(currentPassword, getUser.password);
+
+        if (!isValidPassword) {
+            return res.status(401).json({ success: false, message: "Current password is incorrect" })
+        }
+
+        const isSamePassword = await bcryptjs.compare(newPassword, getUser.password);
+        if (isSamePassword) {
+            return res.status(400).json({ success: false, message: "New password must be different from the current password" });
+        }
+
+        const hashedPassword = await bcryptjs.hash(newPassword, 10);
+        getUser.password = hashedPassword;
+        await getUser.save();
+        sendResetSuccessEmail(getUser.email);
+
+        res.status(200).json({ success: true, message: "Password Changed Successfully" })
+
+    } catch (error) {
+        console.log("Error in changePassword", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+    }
+}

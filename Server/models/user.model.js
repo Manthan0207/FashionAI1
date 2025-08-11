@@ -118,7 +118,11 @@ const userSchema = new mongoose.Schema(
                 msgType: { type: String, enum: ["order", "purchase", "wishlist", "review", "admin"], required: true },
                 createdAt: { type: Date, default: Date.now }
             }
-        ]
+        ],
+        is2FA: {
+            type: Boolean,
+            default: false
+        }
 
     }, { timestamps: true })
 

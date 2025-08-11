@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { Loader2, ArrowLeft, Check, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 const Onboarding = () => {
     const [step, setStep] = useState(1);
@@ -84,7 +85,7 @@ const Onboarding = () => {
 
     const handleNextClick = async () => {
         if (!imageFile) {
-            alert("Please upload an image first");
+            toast.error("Please upload an image first");
             return;
         }
 
@@ -108,13 +109,13 @@ const Onboarding = () => {
                 setSkintone(data.skintone)
                 setStep(3);
             } else {
-                alert("Please upload a clear image with your full face and body visible.");
+                toast.error("Please upload a clear image with your full face and body visible.");
                 setImageFile(null);
                 setImagePreview(null);
             }
         } catch (error) {
             console.error("Detection error:", error);
-            alert("Failed to detect face/body. Please try again.");
+            toast.error("Failed to detect face/body. Please try again.");
             setImageFile(null);
             setImagePreview(null);
         }

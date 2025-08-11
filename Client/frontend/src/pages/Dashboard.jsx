@@ -515,12 +515,20 @@ const Dashboard = () => {
 
 
                                     <div className="flex gap-2">
-                                        <button
+                                        {/* <button
                                             className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 active:bg-green-700 transition-colors duration-200 font-medium disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-400"
                                             disabled={item.stock === 0}
                                         >
                                             Buy Now
+                                        </button> */}
+                                        <button
+                                            className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 active:bg-green-700 transition-colors duration-200 font-medium disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-400"
+                                            disabled={item.stock === 0}
+                                            title={item.stock === 0 ? "Item out of stock" : ""}
+                                        >
+                                            Buy Now
                                         </button>
+
 
                                         <button
                                             className="flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 active:bg-gray-900 transition-colors duration-200 shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-400"
