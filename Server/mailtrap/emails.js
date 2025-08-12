@@ -2,7 +2,8 @@ import { transporter, sender } from './mailtrap.config.js';
 import {
     VERIFICATION_EMAIL_TEMPLATE,
     PASSWORD_RESET_REQUEST_TEMPLATE,
-    PASSWORD_RESET_SUCCESS_TEMPLATE
+    PASSWORD_RESET_SUCCESS_TEMPLATE,
+    TWO_FA_VERIFICATION_EMAIL_TEMPLATE
 } from './emailTemplates.js';
 
 export const sendVerificationEmail = async (email, verificationToken) => {
@@ -19,6 +20,24 @@ export const sendVerificationEmail = async (email, verificationToken) => {
         throw new Error("Error Sending verification email");
     }
 };
+
+export const send2FAVerificationEmail = async (email, verificationToken) => {
+
+    try {
+        const response = await transporter.sendMail({
+            from: `"${sender.name}" <${sender.email}>`,
+            to: email,
+            subject: "Verify Your Email",
+            html: TWO_FA_VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", verificationToken),
+        })
+        console.log("Email Sent Successfully", response);
+
+
+    } catch (error) {
+        console.error("Error Sending 2FA verification email:", error);
+        throw new Error("Error Sending 2FA verification email");
+    }
+}
 
 export const sendWelcomeEmail = async (email, username) => {
     const html = `

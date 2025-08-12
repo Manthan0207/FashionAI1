@@ -42,6 +42,20 @@ export const useAuthStore = create(
                     }
                 },
 
+                verify2FAEmail: async (code) => {
+
+                    set({ isLoading: true, error: null })
+                    try {
+                        const response = await axios.post(`${API_URL}/api/auth/verify-2FA-email`, { code });
+                        set({ user: response.data.updatedUser, isAuthenticated: true, isLoading: false })
+                        return response.data
+                    } catch (error) {
+                        set({ error: error.response.data.message || "Error Verifying Email", isLoading: false })
+                        throw error;
+                    }
+
+                },
+
                 logout: async () => {
                     set({ isLoading: true, error: null })
                     try {
@@ -345,6 +359,41 @@ export const useAuthStore = create(
                             message: errorMessage
                         };
                     }
+                },
+                toggle2FA: async () => {
+                    set({ isLoading: true, error: null, message: null })
+                    try {
+                        const response = await axios.post(`${API_URL}/api/auth/toggle-2FA`);
+                        set({ isLoading: false, message: response.data.message, user: response.data.updatedUser })
+                        return { isSuccess: response.data.success, message: response.data.message, twoFAStatus: response.data.updatedUser.is2FA };
+                    } catch (error) {
+                        const errorMessage = error?.response?.data?.message || "Error in toggle 2FA";
+                        set({
+                            isLoading: false,
+                            error: null,
+                            message: errorMessage
+                        });
+                        return { isSuccess: false, message: errorMessage, twoFAStatus: error.response.data.updatedUser.is2FA };
+
+                    }
+                },
+                checkLoginCredentials: async (data) => {
+                    set({ isLoading: true, error: null, message: null })
+                    try {
+                        const response = await axios.post(`${API_URL}/api/auth/check-login-credentials`, data);
+                        set({ isLoading: false, message: response.data.message })
+                        return { isSuccess: response.data.success, message: response.data.message };
+                    } catch (error) {
+                        const errorMessage = error?.response?.data?.message || "Error in checking Login Credentials";
+                        set({
+                            isLoading: false,
+                            error: null,
+                            message: errorMessage
+                        });
+                        return { isSuccess: false, message: errorMessage };
+
+                    }
+
                 }
 
             }

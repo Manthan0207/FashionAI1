@@ -9,7 +9,7 @@ function EmailVerificationPage() {
     const inputRefs = useRef([]);
     const navigate = useNavigate();
 
-    const { error, verifyEmail, isLoading } = useAuthStore();
+    const { error, verifyEmail, isLoading, user, verify2FAEmail } = useAuthStore();
 
     const handleChange = (index, value) => {
         const newCode = [...code];
@@ -45,9 +45,18 @@ function EmailVerificationPage() {
         e.preventDefault();
         const verificationCode = code.join("");
         try {
-            await verifyEmail(verificationCode);
-            toast.success("Email Verified Successfully");
-            navigate("/onboard");
+            if (!user.is2FA) {
+                await verifyEmail(verificationCode);
+                toast.success("Email Verified Successfully");
+                navigate("/onboard");
+            }
+            else {
+                await verify2FAEmail(verificationCode);
+                toast.success("Email Verified Successfully ")
+                setTimeout(() => { }, 2000)
+                navigate('/')
+            }
+
         } catch (error) {
             // error handled via store error state
             console.error(error);

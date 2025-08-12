@@ -614,7 +614,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 function Settings() {
-    const { logout, changePassword, message } = useAuthStore();
+    const { logout, changePassword, user, toggle2FA } = useAuthStore();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('profile');
 
@@ -622,7 +622,7 @@ function Settings() {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+    const [twoFactorEnabled, setTwoFactorEnabled] = useState(user.is2FA);
 
     // Account state
     const [newEmail, setNewEmail] = useState('');
@@ -668,6 +668,19 @@ function Settings() {
             console.error('Error changing email:', error);
         }
     };
+
+    const handleToggle2FA = async () => {
+        const { isSuccess, message, twoFAStatus } = await toggle2FA();
+
+        if (isSuccess == true) {
+            toast.success(message);
+            setTwoFactorEnabled(twoFAStatus);
+        }
+        else {
+            toast.error(message)
+        }
+
+    }
 
     const handleDeleteAccount = async () => {
         if (deleteConfirm !== "DELETE MY ACCOUNT") {
@@ -827,7 +840,7 @@ function Settings() {
                                                         {twoFactorEnabled ? "Enabled" : "Disabled"}
                                                     </span>
                                                     <button
-                                                        onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
+                                                        onClick={handleToggle2FA}
                                                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${twoFactorEnabled ? "bg-indigo-500" : "bg-slate-300"
                                                             }`}
                                                     >

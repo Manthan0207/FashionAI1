@@ -1,7 +1,7 @@
 import { User } from '../models/user.model.js'
 import bcryptjs from 'bcryptjs';
 import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
-import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } from '../mailtrap/emails.js'
+import { sendVerificationEmail, send2FAVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } from '../mailtrap/emails.js'
 import crypto from 'crypto'
 import cloudinary from '../utils/cloudinary.config.js';
 import { Order } from '../models/orders.model.js';
@@ -447,4 +447,84 @@ export const changePassword = async (req, res) => {
         console.log("Error in changePassword", error.message);
         res.status(500).json({ success: false, message: "Internal Server Error" })
     }
+}
+
+export const toggle2FA = async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        const getUser = await User.findById(userId);
+
+        if (!getUser) {
+            return res.status(404).json({ success: false, message: "User Doesn't exist" })
+        }
+        getUser.is2FA = !getUser.is2FA;
+        await getUser.save();
+
+        res.status(200).json({ success: true, message: `2FA is turned ${getUser.is2FA ? "ON" : "OFF"}`, updatedUser: getUser })
+    } catch (error) {
+        console.log("Error in toggle2FA", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+    }
+}
+
+
+export const checkLoginCredentials = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const getUser = await User.findOne({ email });
+        if (!getUser) {
+            return res.status(400).json({ success: false, message: " Invalid Credentials" })
+        }
+
+        const isPasswordValid = await bcryptjs.compare(password, getUser.password)
+        if (!isPasswordValid) {
+            return res.status(400).json({ success: false, message: " Invalid Credentials" })
+        }
+
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+        getUser.verificationToken = verificationToken;
+        getUser.verificationTokenExpiresAt = Date.now() + 24 * 3600 * 1000; //valid for 24 hours
+
+        await getUser.save();
+
+        await send2FAVerificationEmail(getUser.email, getUser.verificationToken)
+
+
+
+        res.status(200).json({ success: true, message: "Credentials Verified" })
+    } catch (error) {
+        console.log("Error in checkLoginCredentials", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+
+    }
+}
+
+export const verify2FAEmail = async (req, res) => {
+    const { code } = req.body;
+
+    try {
+        const getUser = await User.findOne({
+            verificationToken: code,
+            verificationTokenExpiresAt: { $gt: Date.now() }
+        })
+
+        if (!getUser) {
+            return res.status(400).json({ success: false, message: "Invalid or expired verification code" })
+        }
+
+        getUser.verificationToken = undefined
+        getUser.verificationTokenExpiresAt = undefined
+        generateTokenAndSetCookie(res, getUser._id)
+
+        getUser.lastLogin = new Date()
+        await getUser.save();
+        res.status(200).json({ success: true, message: "Logged in Successfully", updatedUser: getUser })
+    } catch (error) {
+        console.log("Error in verify2FAEMail", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+
+    }
+
 }

@@ -1,19 +1,38 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Loader } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import { useAuthStore } from "../store/authStore";
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const { isLoading, login, error } = useAuthStore();
+    const navigate = useNavigate()
+
+    const { isLoading, login, error, user, checkLoginCredentials } = useAuthStore();
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        await login(email, password);
+        if (!user.is2FA) {
+            await login(email, password);
+            return;
+        }
+
+        const { isSuccess, message } = await checkLoginCredentials({ email, password });
+        if (isSuccess == true) {
+            toast.success(message);
+            navigate('/verify-email')
+
+        }
+        else {
+            toast.error(message)
+            setEmail("");
+            setPassword("");
+        }
+
     };
 
     return (
