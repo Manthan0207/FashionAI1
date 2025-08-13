@@ -381,8 +381,8 @@ export const useAuthStore = create(
                     set({ isLoading: true, error: null, message: null })
                     try {
                         const response = await axios.post(`${API_URL}/api/auth/check-login-credentials`, data);
-                        set({ isLoading: false, message: response.data.message })
-                        return { isSuccess: response.data.success, message: response.data.message };
+                        set({ isLoading: false, message: response.data.message, user: response.data.user })
+                        return { isSuccess: response.data.success, message: response.data.message, user: response.data.user };
                     } catch (error) {
                         const errorMessage = error?.response?.data?.message || "Error in checking Login Credentials";
                         set({
@@ -394,6 +394,36 @@ export const useAuthStore = create(
 
                     }
 
+                },
+
+                changeEmailPasswordvalidation: async (data) => {
+                    set({ isLoading: true, error: null, message: null });
+                    try {
+                        const response = await axios.post(`${API_URL}/api/auth/change-email-validation`, data);
+                        set({ isLoading: false, message: response.data.message })
+                        return { isSuccess: response.data.success, message: response.data.message };
+                    } catch (error) {
+                        const errorMessage = error?.response?.data?.message || "Error in checking Change Mail check validations";
+                        set({
+                            isLoading: false,
+                            error: errorMessage,
+                            message: errorMessage
+                        });
+                        return { isSuccess: false, message: errorMessage };
+
+                    }
+
+                },
+                verifyNewEmail: async (code, newEmail) => {
+                    set({ isLoading: true, error: null, message: null })
+                    try {
+                        const response = await axios.post(`${API_URL}/api/auth/new-email-verification`, { code, newEmail });
+                        set({ user: response.data.updatedUser, isAuthenticated: true, isLoading: false })
+                        return response.data
+                    } catch (error) {
+                        set({ error: error.response.data.message || "Error Verifying Email", isLoading: false })
+                        throw error;
+                    }
                 }
 
             }

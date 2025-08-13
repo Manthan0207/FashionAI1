@@ -1,7 +1,7 @@
 import { User } from '../models/user.model.js'
 import bcryptjs from 'bcryptjs';
 import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
-import { sendVerificationEmail, send2FAVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } from '../mailtrap/emails.js'
+import { sendVerificationEmail, send2FAVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail, changeEmailVerification } from '../mailtrap/emails.js'
 import crypto from 'crypto'
 import cloudinary from '../utils/cloudinary.config.js';
 import { Order } from '../models/orders.model.js';
@@ -483,17 +483,19 @@ export const checkLoginCredentials = async (req, res) => {
             return res.status(400).json({ success: false, message: " Invalid Credentials" })
         }
 
-        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
-        getUser.verificationToken = verificationToken;
-        getUser.verificationTokenExpiresAt = Date.now() + 24 * 3600 * 1000; //valid for 24 hours
+        if (getUser.is2FA == true) {
+            const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+            getUser.verificationToken = verificationToken;
+            getUser.verificationTokenExpiresAt = Date.now() + 24 * 3600 * 1000; //valid for 24 hours
 
-        await getUser.save();
+            await getUser.save();
 
-        await send2FAVerificationEmail(getUser.email, getUser.verificationToken)
+            await send2FAVerificationEmail(getUser.email, getUser.verificationToken)
+        }
 
 
 
-        res.status(200).json({ success: true, message: "Credentials Verified" })
+        res.status(200).json({ success: true, message: "Credentials Verified", user: getUser.is2FA ? getUser : null })
     } catch (error) {
         console.log("Error in checkLoginCredentials", error.message);
         res.status(500).json({ success: false, message: "Internal Server Error" })
@@ -526,5 +528,73 @@ export const verify2FAEmail = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" })
 
     }
+}
 
+
+export const changeEmailCheckPassword = async (req, res) => {
+    const userId = req.userId;
+    const { newEmail, password } = req.body;
+
+    try {
+        const isEmailExistAlready = await User.findOne({ email: newEmail });
+        if (isEmailExistAlready) {
+            return res.status(409).json({ success: false, message: "Email Already Exists" })
+        }
+        const getUser = await User.findById(userId);
+        if (!getUser) {
+            return res.status(400).json({ success: false, message: "User Doesn't Exist" });
+        }
+        const isCorrectPassword = await bcryptjs.compare(password, getUser.password);
+        if (!isCorrectPassword) {
+            return res.status(400).json({ success: false, message: "Incorrect Password" })
+        }
+
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+        getUser.verificationToken = verificationToken;
+        getUser.verificationTokenExpiresAt = Date.now() + 24 * 3600 * 1000; //valid for 24 hours
+        getUser.pendingMail = newEmail;
+
+        await getUser.save();
+
+        changeEmailVerification(newEmail, getUser.verificationToken)
+        res.status(200).json({ success: true, message: "Please Check Your Mail and enter verification code" })
+    } catch (error) {
+        console.log("Error in changeEmailCheckPassword", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+    }
+}
+
+export const newEmailVerification = async (req, res) => {
+    const userId = req.userId;
+    const { code, newEmail } = req.body;
+    console.log(code);
+
+
+    try {
+        const getUser = await User.findOne({
+            _id: userId,
+            verificationToken: code,
+            verificationTokenExpiresAt: { $gt: Date.now() }
+        })
+        if (!getUser) {
+            return res.status(400).json({ success: false, message: "Invalid or expired verification code" })
+        }
+
+        if (getUser.pendingMail !== newEmail) {
+            return res.status(401).json({ success: false, message: "Unauthorized" })
+        }
+
+
+        getUser.verificationToken = undefined
+        getUser.verificationTokenExpiresAt = undefined
+        getUser.email = newEmail
+        getUser.pendingMail = null
+        await getUser.save();
+        res.status(200).json({ success: true, message: "Email Changed Successfully", updatedUser: getUser });
+
+
+    } catch (error) {
+        console.log("Error in new Email Verification", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+    }
 }

@@ -3,7 +3,8 @@ import {
     VERIFICATION_EMAIL_TEMPLATE,
     PASSWORD_RESET_REQUEST_TEMPLATE,
     PASSWORD_RESET_SUCCESS_TEMPLATE,
-    TWO_FA_VERIFICATION_EMAIL_TEMPLATE
+    TWO_FA_VERIFICATION_EMAIL_TEMPLATE,
+    CHANGE_EMAIL_VERIFICATION_TEMPLATE
 } from './emailTemplates.js';
 
 export const sendVerificationEmail = async (email, verificationToken) => {
@@ -37,6 +38,24 @@ export const send2FAVerificationEmail = async (email, verificationToken) => {
         console.error("Error Sending 2FA verification email:", error);
         throw new Error("Error Sending 2FA verification email");
     }
+}
+
+export const changeEmailVerification = async (email, verificationToken) => {
+    try {
+        const response = await transporter.sendMail({
+            from: `"${sender.name}" <${sender.email}>`,
+            to: email,
+            subject: "Verify Your Email",
+            html: CHANGE_EMAIL_VERIFICATION_TEMPLATE.replace("{verificationCode}", verificationToken),
+        })
+        console.log("Email Sent Successfully", response);
+
+
+    } catch (error) {
+        console.error("Error in sending change mail verification code :", error);
+        throw new Error("Error in sending change mail verification code");
+    }
+
 }
 
 export const sendWelcomeEmail = async (email, username) => {

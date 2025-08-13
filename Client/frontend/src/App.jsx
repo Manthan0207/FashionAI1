@@ -25,6 +25,7 @@ import AllOrderPage from "./pages/AllOrderPage";
 import SellsDetails from "./pages/SellsDetails";
 import Wishlist from "./pages/Wishlist";
 import Settings from "./pages/Settings";
+import ChangeEmailVerificationPage from "./pages/ChangeEmailVerificationPage";
 
 
 const ProtectedRoute = ({ children }) => {
@@ -119,6 +120,7 @@ function App() {
         <Route path='/seller-sales' element={<SellsDetails />}></Route>
         <Route path='/wishlist' element={<Wishlist />}></Route>
         <Route path='/settings' element={<Settings />}></Route>
+        <Route path='/change-email-verification' element={<ChangeEmailVerificationPage />}></Route>
       </Routes>
 
       <Toaster />

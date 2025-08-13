@@ -123,3 +123,31 @@ export const TWO_FA_VERIFICATION_EMAIL_TEMPLATE = `
 </body>
 </html>
 `;
+
+export const CHANGE_EMAIL_VERIFICATION_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your New Email</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: linear-gradient(to right, #3F51B5, #2196F3); padding: 20px; text-align: center;">
+    <h1 style="color: white; margin: 0;">Email Change Verification</h1>
+  </div>
+  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <p>Hello,</p>
+    <p>You're attempting to change the email address associated with your account. To confirm this change, please enter the verification code below:</p>
+    <div style="text-align: center; margin: 30px 0;">
+      <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #3F51B5;">{verificationCode}</span>
+    </div>
+    <p>This code is valid for 10 minutes. If you did not request this change, please contact support immediately.</p>
+    <p>Best regards,<br>Your App Team</p>
+  </div>
+  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
+    <p>This is an automated message, please do not reply to this email.</p>
+  </div>
+</body>
+</html>
+`;

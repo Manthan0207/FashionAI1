@@ -614,12 +614,13 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 function Settings() {
-    const { logout, changePassword, user, toggle2FA } = useAuthStore();
+    const { logout, changePassword, user, toggle2FA, changeEmailPasswordvalidation, error } = useAuthStore();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('profile');
 
     // Security state
     const [currentPassword, setCurrentPassword] = useState('');
+    const [changeMailPassword, setChangeMailPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(user.is2FA);
@@ -659,14 +660,18 @@ function Settings() {
             return;
         }
 
-        try {
-            // API call to change email would go here
-            toast.success("Email change request sent! Check your inbox.");
-            setNewEmail('');
-        } catch (error) {
-            toast.error("Failed to change email");
-            console.error('Error changing email:', error);
+        const { isSuccess, message } = await changeEmailPasswordvalidation({ newEmail: newEmail, password: changeMailPassword });
+
+        if (isSuccess == true) {
+            toast.success(message);
+            navigate('/change-email-verification', { state: { newEmail } })
         }
+        else {
+            toast.error(message);
+            setChangeMailPassword('');
+            setNewEmail('');
+        }
+
     };
 
     const handleToggle2FA = async () => {
@@ -896,15 +901,27 @@ function Settings() {
                                                     />
                                                 </div>
 
-                                                <div className="pt-2">
+                                                <div className="mt-4">
+                                                    <label className="block text-sm font-medium text-slate-700 mb-2">Current Password</label>
+                                                    <input
+                                                        type="password"
+                                                        value={changeMailPassword}
+                                                        onChange={(e) => setChangeMailPassword(e.target.value)}
+                                                        className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                                                        placeholder="Enter your current password"
+                                                    />
+                                                </div>
+
+                                                <div className="pt-4">
                                                     <button
                                                         onClick={handleChangeEmail}
-                                                        disabled={!newEmail}
+                                                        disabled={!newEmail || !changeMailPassword}
                                                         className="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
                                                     >
                                                         Change Email Address
                                                     </button>
                                                 </div>
+
                                             </div>
                                         </div>
 

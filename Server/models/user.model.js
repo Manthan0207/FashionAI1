@@ -122,6 +122,10 @@ const userSchema = new mongoose.Schema(
         is2FA: {
             type: Boolean,
             default: false
+        },
+        pendingMail: {
+            type: String,
+            default: null
         }
 
     }, { timestamps: true })

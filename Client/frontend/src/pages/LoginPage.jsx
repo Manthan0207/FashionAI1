@@ -12,16 +12,20 @@ export default function LoginPage() {
 
     const navigate = useNavigate()
 
-    const { isLoading, login, error, user, checkLoginCredentials } = useAuthStore();
+    const { isLoading, login, error, checkLoginCredentials } = useAuthStore();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        const { isSuccess, message, user } = await checkLoginCredentials({ email, password });
+        if (!user) {
+            await login(email, password);
+            return;
+        }
         if (!user.is2FA) {
             await login(email, password);
             return;
         }
 
-        const { isSuccess, message } = await checkLoginCredentials({ email, password });
         if (isSuccess == true) {
             toast.success(message);
             navigate('/verify-email')
