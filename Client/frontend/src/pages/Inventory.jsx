@@ -199,7 +199,7 @@ const Inventory = () => {
 
         const stockInfo = getStockStatus(product.stock);
         const discount = product.discountedPrice > 0 ? Math.round(((product.price - product.discountedPrice) / product.price) * 100) : 0;
-        const averageRating = product.ratings.length > 0 ? (product.ratings.reduce((sum, rating) => sum + rating, 0) / product.ratings.length).toFixed(1) : "0.0";
+        const averageRating = product.ratings?.length > 0 ? (product.ratings.reduce((sum, rating) => sum + rating, 0) / product.ratings.length).toFixed(1) : "0.0";
 
         return (
             // <div className="bg-white rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 overflow-hidden">

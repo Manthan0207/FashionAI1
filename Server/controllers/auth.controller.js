@@ -567,7 +567,6 @@ export const changeEmailCheckPassword = async (req, res) => {
 export const newEmailVerification = async (req, res) => {
     const userId = req.userId;
     const { code, newEmail } = req.body;
-    console.log(code);
 
 
     try {

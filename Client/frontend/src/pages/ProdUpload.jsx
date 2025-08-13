@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Package, ShoppingCart, DollarSign, Store, Upload, Plus, X, ArrowLeft, Save, Eye, Image, Tag, Palette, Ruler, Calendar, Box } from 'lucide-react';
+import { User, Package, ShoppingCart, DollarSign, Store, Upload, Plus, X, ArrowLeft, Save, Eye, Image, Tag, Palette, Ruler, Calendar, Box, Loader } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { useNavigate, Link } from 'react-router-dom';
 import SellerNavbar from '../components/SellerNavbar';
@@ -47,6 +47,7 @@ const ProdUpload = () => {
     const [newTag, setNewTag] = useState('');
     const [newColor, setNewColor] = useState('');
 
+    const [isLoading, setIsLoading] = useState(false)
 
     const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL'];
     const fitTypeOptions = ['Regular', 'Slim', 'Relaxed', 'Oversized', 'Tight'];
@@ -136,15 +137,91 @@ const ProdUpload = () => {
         setImageFiles(prev => prev.filter((_, i) => i !== index));
     };
 
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     setIsLoading(true)
+
+    //     // Check if any required field is empty
+    //     const requiredFields = [
+    //         'name',
+    //         'description',
+    //         'price',
+    //         'discountedPrice',
+    //         'sizesAvailable',
+    //         'colors',
+    //         'fitType',
+    //         'gender',
+    //         'ageRange',
+    //         'styleTags',
+    //         'stock',
+    //         'images',
+    //         'material'
+    //     ];
+
+    //     for (let field of requiredFields) {
+    //         const value = formData[field];
+    //         if (
+    //             value === '' ||
+    //             value === null ||
+    //             value === undefined ||
+    //             (Array.isArray(value) && value.length === 0)
+    //         ) {
+    //             return toast.error("Please fill in all required details!");
+    //         }
+    //     }
+
+    //     if (formData.colors.length !== formData.images.length) {
+    //         return toast.error("The number of images and colors must be the same!");
+    //     }
+
+    //     await addProduct(formData);
+    //     toast.success('Product uploaded successfully!');
+    //     navigate('/seller-inventory')
+    // };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Product data:', formData);
-        if (formData.colors.length != formData.images.length) {
-            return toast.error("The no of images and colors must be same!")
+
+        // Validation first
+        const requiredFields = [
+            'name', 'description', 'price', 'discountedPrice',
+            'sizesAvailable', 'colors', 'fitType', 'gender',
+            'ageRange', 'styleTags', 'stock', 'images', 'material'
+        ];
+
+        for (let field of requiredFields) {
+            const value = formData[field];
+            if (
+                value === '' ||
+                value === null ||
+                value === undefined ||
+                (Array.isArray(value) && value.length === 0)
+            ) {
+                toast.error("Please fill in all required details!");
+                return; // Exit without setting isLoading
+            }
         }
-        await addProduct(formData)
-        alert('Product uploaded successfully!');
+
+        if (formData.colors.length !== formData.images.length) {
+            toast.error("The number of images and colors must be the same!");
+            return;
+        }
+
+        // ✅ Passed validation — now disable button
+        setIsLoading(true);
+
+        try {
+            await addProduct(formData);
+            toast.success('Product uploaded successfully!');
+            navigate('/seller-inventory');
+        } catch (error) {
+            toast.error('Failed to upload product.');
+        } finally {
+            setIsLoading(false);
+        }
     };
+
+
 
     return (
         <div className="min-h-screen bg-slate-50 flex">
@@ -495,11 +572,23 @@ const ProdUpload = () => {
 
                                     <div className="space-y-3">
                                         <button
-                                            type="submit"
+                                            onClick={handleSubmit}
+                                            disabled={isLoading}
                                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
                                         >
-                                            <Save className="w-4 h-4" />
-                                            <span>Upload Product</span>
+
+                                            <span className="flex items-center justify-center gap-2">
+                                                {isLoading ? (
+                                                    <Loader className="w-6 h-6 animate-spin" />
+                                                ) : (
+                                                    <>
+                                                        <Save className="w-4 h-4" />
+                                                        <span>Upload Product</span>
+                                                    </>
+                                                )}
+                                            </span>
+
+
                                         </button>
                                         <button
                                             type="button"
