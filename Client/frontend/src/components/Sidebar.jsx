@@ -16,15 +16,59 @@ import {
     X,
     Sparkles,
     Store,
+    LogOut,
 } from "lucide-react"
 import { useAuthStore } from "../store/authStore"
+
+const LogoutConfirmationModal = ({ onConfirm, onCancel }) => {
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+            <div
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                onClick={onCancel}
+            />
+            <motion.div
+                className="relative bg-white rounded-xl shadow-xl border border-slate-200 p-6 w-full max-w-sm"
+            >
+                <div className="flex flex-col space-y-4">
+                    <div className="text-center">
+                        <LogOut size={40} className="mx-auto text-rose-500 mb-3" />
+                        <h3 className="text-lg font-semibold text-slate-800">Log out?</h3>
+                        <p className="text-slate-500 mt-1">Are you sure you want to sign out of your account?</p>
+                    </div>
+                    <div className="flex space-x-3 mt-4">
+                        <button
+                            onClick={onCancel}
+                            className="flex-1 py-2.5 px-4 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors font-medium"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            className="flex-1 py-2.5 px-4 rounded-lg bg-rose-500 text-white hover:bg-rose-600 transition-colors font-medium"
+                        >
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
+        </motion.div>
+    )
+}
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [isHovered, setIsHovered] = useState(false)
     const [isLargeScreen, setIsLargeScreen] = useState(false)
-    const { user } = useAuthStore()
+    const { user, logout } = useAuthStore()
     const location = useLocation()
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+
 
     // Detect screen size to handle sidebar state
     useEffect(() => {
@@ -40,15 +84,15 @@ const Sidebar = () => {
 
     const menuItems = [
         { icon: Home, label: "Dashboard", path: "/" },
-        { icon: ShoppingBag, label: "Collections", path: "/collections" },
-        { icon: TrendingUp, label: "Trending", path: "/trending" },
+        // { icon: ShoppingBag, label: "Collections", path: "/collections" },
+        // { icon: TrendingUp, label: "Trending", path: "/trending" },
         { icon: Heart, label: "Wishlists", path: "/wishlist" },
-        { icon: Star, label: "Featured", path: "/featured" },
-        { icon: Search, label: "Discover", path: "/discover" },
-        { icon: User, label: "Profile", path: "/profile" },
-        { icon: Settings, label: "Settings", path: "/settings" },
+        // { icon: Star, label: "Featured", path: "/featured" },
+        // { icon: Search, label: "Discover", path: "/discover" },
         { icon: ShoppingBag, label: "Orders", path: '/orders' },
         ...(user?.isSeller ? [{ icon: Store, label: "Seller Dashboard", path: "/seller-dashboard" }] : []),
+        { icon: User, label: "Profile", path: "/profile" },
+        { icon: Settings, label: "Settings", path: "/settings" },
     ]
 
     const menuItemVariants = {
@@ -64,6 +108,13 @@ const Sidebar = () => {
         }),
     }
 
+    const handleLogout = async () => {
+        await logout()
+    }
+
+    const handleLogoutClick = () => {
+        setShowLogoutConfirm(true)
+    }
     const isExpanded = isLargeScreen ? isHovered : isOpen
 
     return (
@@ -195,28 +246,39 @@ const Sidebar = () => {
                             })}
                         </ul>
                     </nav>
-
-                    {/* User Profile Section */}
+                    {/* Logout Button Section - Always shows icon, shows text when expanded */}
                     <div className="p-4 border-t border-slate-200/50">
-                        <div
-                            className={`flex items-center ${isExpanded ? "space-x-3" : "justify-center"
-                                } p-3 rounded-xl bg-gradient-to-r from-slate-50 to-indigo-50 border border-slate-200/50`}
+                        <motion.button
+                            whileHover={{ x: 4 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={handleLogoutClick}
+                            className={`group flex items-center w-full ${isExpanded ? "space-x-3 px-3" : "justify-center"} py-3 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-rose-600 transition-all duration-300`}
                         >
-                            <div className="relative flex-shrink-0">
-                                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                                    <User size={16} className="text-white" />
-                                </div>
-                                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
-                            </div>
-                            <div
-                                className={`flex-1 transition-all duration-300 ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
-                                    }`}
-                            >
-                                <p className="font-semibold text-slate-800 text-sm whitespace-nowrap">{user?.name || "Alex Johnson"}</p>
-                                <p className="text-slate-500 text-xs whitespace-nowrap">Premium Member</p>
-                            </div>
-                        </div>
+                            <LogOut
+                                size={20}
+                                className={`text-slate-600 group-hover:text-rose-600 ${!isExpanded ? "mx-auto" : ""}`}
+                            />
+                            {isExpanded && (
+                                <span className="font-medium text-sm whitespace-nowrap">
+                                    Logout
+                                </span>
+                            )}
+                        </motion.button>
                     </div>
+
+                    {/* Confirmation modal */}
+                    <AnimatePresence>
+                        {showLogoutConfirm && (
+                            <LogoutConfirmationModal
+                                onConfirm={handleLogout}
+                                onCancel={() => setShowLogoutConfirm(false)}
+                            />
+                        )}
+                    </AnimatePresence>
+
+                    {/* Add this AnimatePresence block somewhere at the root level */}
+
+
                 </div>
             </div>
 
@@ -229,6 +291,7 @@ const Sidebar = () => {
                     animation: shimmer 2s infinite;
                 }
             `}</style>
+
         </>
     )
 }
