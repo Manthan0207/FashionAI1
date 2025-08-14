@@ -36,7 +36,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!user.isVerified) {
-    return <Navigate to='/verify-email' replace />
+    return <Navigate to='/landing-page' replace />
   }
 
   return children
@@ -119,7 +119,11 @@ function App() {
         <Route path='/orders' element={<AllOrderPage />}></Route>
         <Route path='/seller-sales' element={<SellsDetails />}></Route>
         <Route path='/wishlist' element={<Wishlist />}></Route>
-        <Route path='/settings' element={<Settings />}></Route>
+        <Route path='/settings' element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        }></Route>
         <Route path='/change-email-verification' element={<ChangeEmailVerificationPage />}></Route>
       </Routes>
 

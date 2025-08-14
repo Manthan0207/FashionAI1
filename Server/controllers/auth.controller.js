@@ -386,8 +386,28 @@ export const updateUserProfile = async (req, res) => {
         if (imageChanged) {
             const response = await cloudinary.uploader.upload(image);
         }
-        const normalizedRange = ageRange.replace(/[–-]/, '-');
-        const [minAge, maxAge] = normalizedRange.split('-').map(Number);
+        let minAge = null;
+        let maxAge = null;
+
+        if (typeof ageRange === "string") {
+            const normalizedRange = ageRange.replace(/[–—]/, '-');
+
+            if (normalizedRange.includes('-')) {
+                const [minStr, maxStr] = normalizedRange.split('-').map(s => s.trim());
+                const minParsed = Number(minStr);
+                const maxParsed = Number(maxStr);
+
+                if (!isNaN(minParsed)) minAge = minParsed;
+                if (!isNaN(maxParsed)) maxAge = maxParsed;
+            } else {
+                // Handle cases like "Under 18"
+                const numberMatch = ageRange.match(/\d+/);
+                if (numberMatch) {
+                    minAge = 0;
+                    maxAge = Number(numberMatch[0]);
+                }
+            }
+        }
         const updateUser = await User.findByIdAndUpdate(id, {
             $set: {
                 userImage: imageChanged ? response.secure_url : image,
@@ -406,7 +426,7 @@ export const updateUserProfile = async (req, res) => {
         }, { new: true })
         res.status(200).json({ success: true, message: "Profile Updated Successfully", user: updateUser })
     } catch (error) {
-        console.log("Error in update user");
+        console.log("Error in update user", error.message);
         res.status(500).json({ success: false, message: "Internal Server Error" })
 
     }

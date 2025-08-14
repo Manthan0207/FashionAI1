@@ -25,7 +25,7 @@ export default function SignUpPage() {
     };
 
     return (
-        <div className="max-h-[75%] flex items-center justify-center bg-gradient-to-r from-pink-100 to-blue-100 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-pink-100 to-blue-100 px-4">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

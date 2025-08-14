@@ -697,7 +697,7 @@ function Settings() {
             // API call to delete account would go here
             toast.success("Account deletion scheduled");
             setShowDeleteModal(false);
-            logout();
+            await logout();
             navigate('/');
         } catch (error) {
             toast.error("Failed to delete account");

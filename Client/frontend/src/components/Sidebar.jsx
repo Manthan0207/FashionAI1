@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import {
     Home,
@@ -68,6 +68,7 @@ const Sidebar = () => {
     const { user, logout } = useAuthStore()
     const location = useLocation()
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+    const navigate = useNavigate();
 
 
     // Detect screen size to handle sidebar state
@@ -109,7 +110,9 @@ const Sidebar = () => {
     }
 
     const handleLogout = async () => {
-        await logout()
+        await logout();
+        navigate('/landing-page');
+
     }
 
     const handleLogoutClick = () => {
