@@ -309,18 +309,63 @@ function ProductDetailPage() {
                                     )}
                                 </button>
                                 <div className="grid grid-cols-2 gap-3">
-                                    <button className="bg-slate-800 text-white py-3 px-6 rounded-xl cursor-pointer"
+                                    {/* <button className="bg-slate-800 text-white py-3 px-6 rounded-xl cursor-pointer"
+                                        disabled={product.stock <= 0}
                                         onClick={() => {
                                             addToCart({ ...product, color: selectedColor, image: product.images[currentImageIndex], size: selectedSize });
+                                            product.stock--;
                                         }}>Add to Cart</button>
                                     <button className="bg-slate-100 text-slate-700 py-3 px-6 rounded-xl cursor-pointer"
+                                        disabled={product.stock == 0}
                                         onClick={() => {
                                             for (let i = 1; i <= quantity; i++) {
                                                 addToCart({ ...product, color: selectedColor, image: product.images[currentImageIndex], size: selectedSize });
                                             }
+                                            product.stock -= quantity;
                                             navigate('/cart')
                                         }}
-                                    >Buy Now</button>
+                                    >Buy Now</button> */}
+                                    <button
+                                        className={`py-3 px-6 rounded-xl cursor-pointer ${product.stock <= 0
+                                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                                : 'bg-slate-800 text-white'
+                                            }`}
+                                        disabled={product.stock <= 0}
+                                        onClick={() => {
+                                            addToCart({
+                                                ...product,
+                                                color: selectedColor,
+                                                image: product.images[currentImageIndex],
+                                                size: selectedSize,
+                                            });
+                                            product.stock--;
+                                        }}
+                                    >
+                                        Add to Cart
+                                    </button>
+
+                                    <button
+                                        className={`py-3 px-6 rounded-xl cursor-pointer ${product.stock <= 0
+                                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                : 'bg-slate-100 text-slate-700'
+                                            }`}
+                                        disabled={product.stock <= 0}
+                                        onClick={() => {
+                                            for (let i = 1; i <= quantity; i++) {
+                                                addToCart({
+                                                    ...product,
+                                                    color: selectedColor,
+                                                    image: product.images[currentImageIndex],
+                                                    size: selectedSize,
+                                                });
+                                            }
+                                            product.stock -= quantity;
+                                            navigate('/cart');
+                                        }}
+                                    >
+                                        Buy Now
+                                    </button>
+
                                 </div>
                             </div>
 
