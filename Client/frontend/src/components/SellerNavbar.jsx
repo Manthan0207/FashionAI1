@@ -12,8 +12,8 @@ function SellerNavbar() {
         { label: 'Inventory', path: '/seller-inventory', icon: <Box className="w-4 h-4" /> },
         { label: 'Add Products', path: '/upload-product', icon: <Plus className="w-4 h-4" /> },
         { label: 'Sales', path: '/seller-sales', icon: <DollarSign className="w-4 h-4" /> },
-        { label: 'Profile', path: '/seller-profile', icon: <User className="w-4 h-4" /> },
-        { label: 'Analytics', path: '/seller-analytics', icon: <Eye className="w-4 h-4" /> },
+        // { label: 'Profile', path: '/seller-profile', icon: <User className="w-4 h-4" /> },
+        // { label: 'Analytics', path: '/seller-analytics', icon: <Eye className="w-4 h-4" /> },
     ]
 
     return (

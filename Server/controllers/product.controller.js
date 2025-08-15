@@ -202,7 +202,7 @@ export const changeProductStatus = async (req, res) => {
 
         res.status(200).json({ success: false, message: "Product Active Status Changed Successful", updatedProd, allProds })
     } catch (error) {
-        console.log("Error in changeProductStatus");
+        console.log("Error in changeProductStatus", error.message);
         res.status(500).json({ success: false, message: "Internal Server Error" })
     }
 }

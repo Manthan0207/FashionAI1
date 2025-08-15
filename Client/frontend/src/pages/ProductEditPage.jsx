@@ -5,6 +5,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import SellerNavbar from '../components/SellerNavbar';
 import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 // FormSection component
 const FormSection = ({ title, icon: Icon, children }) => (
@@ -80,7 +81,7 @@ const ProductEditPage = () => {
                     isFeatured: product.isFeatured || false,
                     returnPolicyDays: product.returnPolicyDays || 7,
                     material: product.material || '',
-                    ratings: product.ratings || [],
+                    ratings: product.reviews.rating || [],
                     reviews: product.reviews || [],
                     totalSales: product.totalSales || 0
                 });
@@ -186,12 +187,15 @@ const ProductEditPage = () => {
         setSaving(true);
 
         try {
+            if (formData.images.length != formData.colors.length) {
+                throw new Error("Images and Color Size must be same.")
+            }
             const updatedProd = await updateProduct(id, formData);
             setFormData(updatedProd)
             navigate('/seller-inventory');
         } catch (error) {
             console.error('Error updating product:', error);
-            alert('Error updating product');
+            toast.error('Error updating product');
         } finally {
             setSaving(false);
         }
@@ -269,9 +273,8 @@ const ProductEditPage = () => {
                                     <div>
                                         <p className="text-slate-600 text-sm font-medium">Average Rating</p>
                                         <p className="text-2xl font-bold text-slate-900 mt-1">
-                                            {formData.ratings.length > 0
-                                                ? (formData.ratings.reduce((a, b) => a + b, 0) / formData.ratings.length).toFixed(1)
-                                                : 'N/A'
+                                            {(formData.reviews?.reduce((sum, r) => sum + r.rating, 0) /
+                                                (formData.reviews?.length || 1)).toFixed(2) || "NA"
                                             }
                                         </p>
                                     </div>
@@ -616,7 +619,7 @@ const ProductEditPage = () => {
 
                                     <div className="space-y-3">
                                         <button
-                                            type="submit"
+                                            onClick={handleSubmit}
                                             disabled={saving}
                                             className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
                                         >

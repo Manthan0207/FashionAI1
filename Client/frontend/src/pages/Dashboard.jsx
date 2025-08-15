@@ -116,34 +116,24 @@ const Dashboard = () => {
         };
     }, [showNotifications]);
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-    // Get unique categories from products (using gender as category)
+
     const categories = ["All", ...new Set(prods?.map(product => product.gender) || [])];
+    const tokens = searchTerm.trim().toLowerCase().split(/\s+/);
+    const hasSearch = tokens[0] !== "";
 
-    const tokens = searchTerm.trim().toLowerCase().split(/\s+/);      // ["cotton", "shirt"]
-    const hasSearch = tokens[0] !== "";                            // true if user typed something
+    const filteredClothes = prods?.filter((item) => {
+        if (activeCategory !== "All" && item.gender !== activeCategory) return false;
+        if (!hasSearch) return true;
+        return tokens.every((token) =>
+            item.name.toLowerCase().includes(token) ||
+            item.material.toLowerCase().includes(token) ||
+            item.gender.toLowerCase().includes(token) ||
+            item.colors?.some((c) => c.toLowerCase().includes(token))
+        );
+    }) || [];
 
-
-
-    // Filter products based on search and category
-    const filteredClothes =
-        prods?.filter((item) => {
-            // 1️⃣ category check
-            if (activeCategory !== "All" && item.gender !== activeCategory) return false;
-
-            // 2️⃣ search check
-            if (!hasSearch) return true; // nothing typed → keep item
-
-            return tokens.every((token) =>
-                item.name.toLowerCase().includes(token) ||
-                item.material.toLowerCase().includes(token) ||
-                item.gender.toLowerCase().includes(token) ||
-                item.colors?.some((c) => c.toLowerCase().includes(token))
-            );
-        }) || [];
-
-    // Calculate stats from real data
     const stats = {
         totalItems: prods.filter((item) => item.isActive).length,
         newArrivals: prods?.filter(p => {
@@ -437,9 +427,11 @@ const Dashboard = () => {
 
                                             <Heart size={16} className={(user?.wishlist?.includes(item._id)) ? 'fill-current' : ''} />
                                         </button>
-                                        <button className="p-2 bg-white rounded-full shadow-md hover:bg-blue-50 transition-colors">
+                                        <Link to={`/product/${item._id}`} className="p-2 bg-white rounded-full shadow-md hover:bg-blue-50 transition-colors"
+
+                                        >
                                             <Eye size={16} className="hover:text-blue-500" />
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
 

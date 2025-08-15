@@ -537,7 +537,7 @@ const Inventory = () => {
 
                     {/* Toggle Product Active Status (Repositioned) */}
                     <div className="flex items-center justify-between mt-4">
-                        <span className="text-sm text-slate-600">{product.isActive ? "Disable" : "Enable"} Product</span>
+                        <span className="text-sm text-slate-600">Product {product.isActive ? "Enable" : "Disabled"}</span>
                         <button
                             onClick={() => changeProductActiveStatus(product._id)}
                             className={`relative inline-block w-12 h-6 rounded-full transition-all duration-300 ${product.isActive ? "bg-indigo-600" : "bg-gray-400"
