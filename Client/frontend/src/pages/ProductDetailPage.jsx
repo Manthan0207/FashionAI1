@@ -256,7 +256,7 @@ function ProductDetailPage() {
                                                 console.log("selected color in color button", selectedColor);
                                             }}
                                             className={` cursor-pointer w-10 h-10 rounded-full border-2 ${selectedColor === color ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-slate-300'}`}
-                                            style={{ backgroundColor: color.toLowerCase() === 'white' ? '#fff' : color.toLowerCase() === 'black' ? '#000' : '#ccc' }}
+                                            style={{ backgroundColor: color.toLowerCase() }}
                                             title={color}
                                         />
                                     ))}
@@ -327,8 +327,8 @@ function ProductDetailPage() {
                                     >Buy Now</button> */}
                                     <button
                                         className={`py-3 px-6 rounded-xl cursor-pointer ${product.stock <= 0
-                                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                                : 'bg-slate-800 text-white'
+                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                            : 'bg-slate-800 text-white'
                                             }`}
                                         disabled={product.stock <= 0}
                                         onClick={() => {
@@ -346,8 +346,8 @@ function ProductDetailPage() {
 
                                     <button
                                         className={`py-3 px-6 rounded-xl cursor-pointer ${product.stock <= 0
-                                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                : 'bg-slate-100 text-slate-700'
+                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                            : 'bg-slate-100 text-slate-700'
                                             }`}
                                         disabled={product.stock <= 0}
                                         onClick={() => {

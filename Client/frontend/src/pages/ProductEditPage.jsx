@@ -173,14 +173,22 @@ const ProductEditPage = () => {
         });
     };
 
+    // const removeImage = (index, e) => {
+    //     e.preventDefault();
+    //     setFormData(prev => ({
+    //         ...prev,
+    //         images: prev.images.filter((_, i) => i !== index)
+    //     }));
+    //     setImageFiles(prev => prev.filter((_, i) => i !== index));
+    // };
     const removeImage = (index, e) => {
         e.preventDefault();
         setFormData(prev => ({
             ...prev,
             images: prev.images.filter((_, i) => i !== index)
         }));
-        setImageFiles(prev => prev.filter((_, i) => i !== index));
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -195,7 +203,7 @@ const ProductEditPage = () => {
             navigate('/seller-inventory');
         } catch (error) {
             console.error('Error updating product:', error);
-            toast.error('Error updating product');
+            toast.error(error.message);
         } finally {
             setSaving(false);
         }
@@ -631,7 +639,7 @@ const ProductEditPage = () => {
                                             ) : (
                                                 <>
                                                     <Save className="w-4 h-4" />
-                                                    <span onClick={handleSubmit}>Update Product</span>
+                                                    <span>Update Product</span>
                                                 </>
                                             )}
                                         </button>
