@@ -199,8 +199,8 @@ const Wishlist = () => {
                                         <div className="flex items-center space-x-1 mb-2">
                                             <Star size={14} className="text-yellow-400 fill-current" />
                                             <span className="text-sm text-slate-600">
-                                                {item.ratings?.length > 0
-                                                    ? (item.ratings.reduce((sum, rating) => sum + rating.rating, 0) / item.ratings.length).toFixed(1)
+                                                {item.reviews?.length > 0
+                                                    ? (item.reviews.reduce((sum, rew) => sum + rew.rating, 0) / item.reviews.length).toFixed(1)
                                                     : '0'
                                                 }
                                             </span>

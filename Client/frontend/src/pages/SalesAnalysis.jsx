@@ -932,3 +932,13 @@
 // };
 
 // export default SalesAnalysis;
+
+import React from 'react'
+
+function SalesAnalysis() {
+    return (
+        <div>SalesAnalysis</div>
+    )
+}
+
+export default SalesAnalysis
