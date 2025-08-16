@@ -7,6 +7,7 @@ import cloudinary from '../utils/cloudinary.config.js';
 import { Order } from '../models/orders.model.js';
 import mongoose from 'mongoose';
 import { response } from 'express';
+import { Product } from '../models/product.model.js';
 
 export const signup = async (req, res) => {
     const { email, password, name } = req.body;
@@ -143,6 +144,31 @@ export const logout = async (req, res) => {
     res.clearCookie("authToken")
     res.status(200).json({ success: true, message: "Logged Out Successfully" })
 }
+
+export const deleteAccount = async (req, res) => {
+    const userId = req.userId;
+    try {
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "Invalid User Id" })
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User Doesn't exist" })
+        }
+        await User.deleteOne({ _id: userId });
+        if (user.isSeller) {
+            await Product.deleteMany({ seller: user._id })
+        }
+        res.clearCookie("authToken")
+        return res.status(200).json({ success: true, message: "Account Deleted Successfully" })
+
+    } catch (error) {
+        console.log("Error in deleteAccount", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+
+    }
+}
+
 
 
 export const forgotPassword = async (req, res) => {

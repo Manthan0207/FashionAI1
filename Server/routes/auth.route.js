@@ -1,5 +1,5 @@
 import express from 'express'
-import { signup, login, getSalesData, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, saveUserImage, saveOnboardData, markNotificationRead, updateUserProfile, changePassword, toggle2FA, checkLoginCredentials, verify2FAEmail, changeEmailCheckPassword, newEmailVerification } from '../controllers/auth.controller.js'
+import { signup, login, getSalesData, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, saveUserImage, saveOnboardData, markNotificationRead, updateUserProfile, changePassword, toggle2FA, checkLoginCredentials, verify2FAEmail, changeEmailCheckPassword, newEmailVerification, deleteAccount } from '../controllers/auth.controller.js'
 import { verifyToken } from '../middleware/verifyToken.js'
 
 const app = express()
@@ -17,6 +17,8 @@ router.post('/verify-2FA-email', verify2FAEmail)
 router.post('/login', login)
 
 router.post('/logout', logout)
+
+router.post('/delete-account', verifyToken, deleteAccount)
 
 router.post('/verify-email', verifyEmail)
 
