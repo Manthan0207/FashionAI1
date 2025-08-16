@@ -26,6 +26,7 @@ import SellsDetails from "./pages/SellsDetails";
 import Wishlist from "./pages/Wishlist";
 import Settings from "./pages/Settings";
 import ChangeEmailVerificationPage from "./pages/ChangeEmailVerificationPage";
+import SalesAnalysis from "./pages/SalesAnalysis";
 
 
 const ProtectedRoute = ({ children }) => {
@@ -119,6 +120,7 @@ function App() {
         <Route path='/orders' element={<AllOrderPage />}></Route>
         <Route path='/seller-sales' element={<SellsDetails />}></Route>
         <Route path='/wishlist' element={<Wishlist />}></Route>
+        <Route path='/sales-analysis' element={<SalesAnalysis />}></Route>
         <Route path='/settings' element={
           <ProtectedRoute>
             <Settings />
