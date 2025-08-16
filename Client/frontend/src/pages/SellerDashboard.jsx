@@ -233,10 +233,10 @@ const SellerDashboard = () => {
                                             Add New Product
                                         </Link>
                                         <Link
-                                            to="/seller-analytics"
+                                            to="/seller-sales"
                                             className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-center font-medium py-3 px-4 rounded-lg transition-colors duration-200"
                                         >
-                                            View Analytics
+                                            View Sales Details
                                         </Link>
                                         <Link
                                             to="/seller-inventory"

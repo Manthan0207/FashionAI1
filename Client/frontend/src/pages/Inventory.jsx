@@ -33,6 +33,7 @@ import { toast } from 'react-hot-toast'
 import { useAuthStore } from '../store/authStore';
 import Swal from 'sweetalert2'
 import { Link } from 'react-router-dom';
+import ProductImageSlider from '../components/ProductImageSlider';
 
 
 
@@ -384,14 +385,16 @@ const Inventory = () => {
             // </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 overflow-hidden">
                 <div className="relative">
-                    <img
+                    {/* <img
                         src={product.images?.[0] || `https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=200&fit=crop`}
                         alt={product.name}
                         className="w-full h-48 object-cover"
                         onError={(e) => {
                             e.currentTarget.src = `https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=200&fit=crop`;
                         }}
-                    />
+                    /> */}
+                    <ProductImageSlider images={product.images} name={product.name} id={product._id} />
+
                     {/* Badges */}
                     <div className="absolute top-3 left-3 flex flex-col space-y-2">
                         {product.isFeatured && (
@@ -537,7 +540,7 @@ const Inventory = () => {
 
                     {/* Toggle Product Active Status (Repositioned) */}
                     <div className="flex items-center justify-between mt-4">
-                        <span className="text-sm text-slate-600">Product {product.isActive ? "Enable" : "Disabled"}</span>
+                        <span className="text-sm text-slate-600">Product Available</span>
                         <button
                             onClick={() => changeProductActiveStatus(product._id)}
                             className={`relative inline-block w-12 h-6 rounded-full transition-all duration-300 ${product.isActive ? "bg-indigo-600" : "bg-gray-400"

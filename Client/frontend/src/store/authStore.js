@@ -221,6 +221,7 @@ export const useAuthStore = create(
                             message: response.data.message, isLoading: false, prods: response.data.products
 
                         })
+                        return response.data.products
                     } catch (error) {
                         set({
                             isLoading: false,

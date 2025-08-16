@@ -836,7 +836,9 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="flex min-h-screen  bg-slate-50 bg-gradient-to-br from-stone-50 to-stone-100">
+        <div className="flex min-h-screen  bg-slate-50 
+        
+        bg-gradient-to-br from-slate-50 to-slate-100">
             <Sidebar />
 
             <div className="flex-1 w-full transition-all duration-300 lg:ml-20">
@@ -1032,7 +1034,7 @@ const Dashboard = () => {
                                     </div>
                                 </div>
 
-                                <div className="p-5">
+                                <div className="p-5 bg-green-50 ">
                                     <div className="flex items-center space-x-1 mb-2">
                                         <Star size={14} className="text-yellow-400 fill-current" />
                                         <span className="text-sm text-slate-600">

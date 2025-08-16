@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Sidebar from '../components/Sidebar';
 import { Search, Heart, ShoppingCart, Star, Eye, Loader2 } from "lucide-react";
@@ -6,20 +6,51 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
 import toast from "react-hot-toast";
+import ProductImageSlider from "../components/ProductImageSlider";
 
 const Wishlist = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [activeCategory, setActiveCategory] = useState("All");
     const { toggleWishlist } = useAuthStore();
     const { cart, addToCart } = useCartStore();
-    const { user, prods } = useAuthStore();
+    const [wishlistedProducts, setWishlistedProducts] = useState([]);
+    const { user, prods, getProducts } = useAuthStore();
     const navigate = useNavigate();
 
-    // Get wishlisted products
-    const wishlistedProducts = prods?.filter(
-        product => user?.wishlist?.includes(product._id)) || [];
 
-    // Get unique categories from wishlisted products
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Only fetch products if we don't have them yet
+
+                var products = await getProducts();
+
+
+                // Filter wishlist once we have both prods and wishlist
+                if (products && user?.wishlist) {
+                    const filtered = products.filter(
+                        product => user.wishlist.includes(product._id)
+                    );
+                    setWishlistedProducts(filtered || []);
+                }
+                console.log(products);
+
+            } catch (err) {
+                console.error("Error loading wishlist:", err);
+                toast.error("Failed to load wishlist");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [user?.wishlist]); // Only depend on user.wishlist changes
+
+
+
+
     const categories = ["All", ...new Set(wishlistedProducts?.map(product => product.gender) || [])];
 
     // Filter products based on search and category
@@ -60,7 +91,7 @@ const Wishlist = () => {
     };
 
     return (
-        <div className="flex min-h-screen bg-slate-50">
+        <div className="flex min-h-screen bg-slate-50 bg-gradient-to-br from-slate-50 to-slate-100">
             <Sidebar />
 
             <div className="flex-1 w-full transition-all duration-300 lg:ml-20">
@@ -142,16 +173,8 @@ const Wishlist = () => {
                                     className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-slate-100"
                                 >
                                     <div className="relative overflow-hidden">
-                                        <Link to={`/product/${item._id}`}>
-                                            <img
-                                                src={item.images?.[0] || `https://placehold.co/300x400?text=${encodeURIComponent(item.name)}`}
-                                                alt={item.name}
-                                                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                                                onError={(e) => {
-                                                    e.currentTarget.src = `https://placehold.co/300x400?text=${encodeURIComponent(item.name)}`
-                                                }}
-                                            />
-                                        </Link>
+                                        <ProductImageSlider images={item.images} name={item.name} id={item._id} />
+
 
                                         {/* Badges */}
                                         <div className="absolute top-3 left-3 flex flex-col space-y-2">
@@ -243,7 +266,7 @@ const Wishlist = () => {
                                             )}
                                         </div>
 
-                                        <div className="flex gap-2">
+                                        {/* <div className="flex gap-2">
                                             <Link to={`/product/${item._id}`}
                                                 className="flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 active:bg-gray-900 transition-colors duration-200 shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-400"
                                                 disabled={item.stock === 0}
@@ -261,6 +284,51 @@ const Wishlist = () => {
                                             >
                                                 <ShoppingCart size={18} />
                                                 <span className="hidden md:inline">Add to Cart</span>
+                                            </button>
+                                        </div> */}
+                                        <div className="flex gap-3 w-full">
+                                            {/* View Product Button */}
+                                            <Link
+                                                to={`/product/${item._id}`}
+                                                className={`
+      flex-1 flex items-center justify-center gap-2 
+      px-4 py-2.5 rounded-lg
+      transition-all duration-200 
+      shadow-sm cursor-pointer
+      focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
+   bg-gray-900 text-white hover:bg-gray-800 active:bg-gray-700 
+    `}
+
+                                            >
+                                                <Eye size={18} className={item.stock === 0 ? 'opacity-70' : ''} />
+                                                <span className="font-medium whitespace-nowrap">View Product</span>
+                                            </Link>
+
+                                            {/* Add to Cart Button */}
+                                            <button
+                                                className={`
+      flex-1 flex items-center justify-center gap-2 
+      px-4 py-2.5 rounded-lg
+      transition-all duration-200 
+      shadow-sm cursor-pointer
+      focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2
+      ${item.stock === 0
+                                                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                                        : 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 hover:shadow-md'
+                                                    }
+    `}
+                                                disabled={item.stock === 0}
+                                                onClick={() => {
+                                                    addToCart({
+                                                        ...item,
+                                                        color: item.colors[0],
+                                                        image: item.images[0],
+                                                        size: item.sizesAvailable[0]
+                                                    });
+                                                }}
+                                            >
+                                                <ShoppingCart size={18} className={item.stock === 0 ? 'opacity-70' : ''} />
+                                                <span className="font-medium whitespace-nowrap hidden md:inline">Add to Cart</span>
                                             </button>
                                         </div>
                                     </div>
