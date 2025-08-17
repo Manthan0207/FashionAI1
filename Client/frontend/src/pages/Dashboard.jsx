@@ -743,9 +743,9 @@ const Dashboard = () => {
         totalItems: prods.filter((item) => item.isActive).length,
         newArrivals: prods?.filter(p => {
             const createdDate = new Date(p.createdAt);
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            return createdDate > thirtyDaysAgo;
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            return createdDate > sevenDaysAgo;
         })?.length || 0,
         trending: prods?.filter(p => p.isFeatured)?.length || 0,
         favorites: prods?.filter(p => p.totalSales > 10)?.length || 0,

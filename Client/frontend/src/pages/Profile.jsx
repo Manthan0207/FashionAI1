@@ -244,7 +244,7 @@ function Profile() {
                                         )}
                                         {skintone && (
                                             <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                                                Skin: {skintone}
+                                                Skintone: {skintone}
                                             </div>
                                         )}
                                     </div>
@@ -521,7 +521,7 @@ function Profile() {
                             {/* Become a Seller Section - Enhanced */}
                             {!user.isSeller && (
                                 <div className="mt-6 p-6 border border-dashed border-emerald-400 rounded-2xl bg-gradient-to-r from-emerald-50 to-indigo-50 text-center">
-                                    <h3 className="text-xl font-bold text-emerald-800 mb-3">Become a Seller on FashionHub</h3>
+                                    <h3 className="text-xl font-bold text-emerald-800 mb-3">Become a Seller on Vesture</h3>
                                     <p className="text-slate-700 mb-5 max-w-2xl mx-auto">
                                         Join our community of fashion creators! Sell your unique designs, reach thousands of customers,
                                         and grow your fashion business with our platform.

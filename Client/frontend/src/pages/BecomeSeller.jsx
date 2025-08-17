@@ -127,9 +127,7 @@ const StoreDetailsForm = () => {
                             {error && (
                                 <p className="text-red-600">{error}</p>
                             )}
-                            {message && (
-                                <p className="text-green-600">{message}</p>
-                            )}
+
                         </div>
 
                         <div className="text-right">
@@ -140,7 +138,7 @@ const StoreDetailsForm = () => {
                                     text-white`}
                                 disabled={isLoading}
                             >
-                                {isLoading ? 'Saving...' : 'Save Changes'}
+                                {isLoading ? 'Saving...' : 'Create Store'}
                             </button>
                         </div>
                     </motion.form>

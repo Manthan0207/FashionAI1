@@ -1055,7 +1055,7 @@ const SellsDetails = () => {
                                                     </div>
                                                     <div className="text-slate-800 font-medium text-sm">
                                                         {formatCurrency(
-                                                            salesData.find(o => o.product.name === product)?.product.price * count || 0
+                                                            salesData.find(o => o.product.name === product)?.product.discountedPrice * count || 0
                                                         )}
                                                     </div>
                                                 </div>

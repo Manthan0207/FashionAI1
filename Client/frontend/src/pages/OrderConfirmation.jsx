@@ -89,8 +89,10 @@ const OrderConfirmation = () => {
         month: 'long',
         year: 'numeric'
     });
+    const estimatedDelivery = new Date(order.createdAt);
+    estimatedDelivery.setDate(estimatedDelivery.getDate() + 7);
 
-    const deliveryDate = new Date(order.estimatedDelivery).toLocaleDateString('en-IN', {
+    const deliveryDate = new Date(estimatedDelivery).toLocaleDateString('en-IN', {
         day: 'numeric',
         month: 'long',
         year: 'numeric'

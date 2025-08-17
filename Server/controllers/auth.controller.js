@@ -351,7 +351,8 @@ export const getSalesData = async (req, res) => {
                         product: {                 // Include selected fields from productDetails
                             _id: "$productDetails._id",
                             name: "$productDetails.name",
-                            price: "$productDetails.price"
+                            price: "$productDetails.price",
+                            discountedPrice: "$productDetails.discountedPrice"
                         },
                         totalAmount: 1,            // Include totalAmount as-is
                         status: 1,                 // Include status as-is
