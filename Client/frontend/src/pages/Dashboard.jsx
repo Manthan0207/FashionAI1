@@ -989,14 +989,14 @@ const Dashboard = () => {
 
                                     {/* Badges */}
                                     <div className="absolute top-3 left-3 flex flex-col space-y-2">
-                                        {/* New Badge - if created within 30 days */}
+                                        {/* New Badge - if created within 7 days */}
                                         {(() => {
                                             console.log("Item : ", item);
 
                                             const createdDate = new Date(item.createdAt);
-                                            const thirtyDaysAgo = new Date();
-                                            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                                            return createdDate > thirtyDaysAgo;
+                                            const sevenDaysAgo = new Date();
+                                            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                                            return createdDate > sevenDaysAgo;
                                         })() && (
                                                 <span className="bg-indigo-500 text-white px-2 py-1 rounded-full text-xs font-medium">New</span>
                                             )}

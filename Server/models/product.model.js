@@ -40,7 +40,7 @@ const prodSchema = mongoose.Schema(
             default: ""
         },
         ageRange: {
-            type: String, // "18–24", "25–34", etc.
+            type: String,
             default: ""
         },
         styleTags: {

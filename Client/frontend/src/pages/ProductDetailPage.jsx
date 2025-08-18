@@ -189,7 +189,7 @@ function ProductDetailPage() {
                                     transition={{ duration: 0.3 }}
                                     src={product.images[currentImageIndex]}
                                     alt={product.name}
-                                    className="w-full h-96 md:h-[600px] object-cover"
+                                    className="w-full h-96 md:h-[600px] object-contain"
                                 />
                                 {product.images.length > 1 && (
                                     <>
@@ -216,7 +216,7 @@ function ProductDetailPage() {
                                         }}
                                         className={`w-20 h-20 rounded-xl overflow-hidden border-2 ${currentImageIndex === index ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-slate-200'}`}
                                     >
-                                        <img src={img} alt={`${product.name} ${index + 1}`} className="w-full h-full object-cover" />
+                                        <img src={img} alt={`${product.name} ${index + 1}`} className="w-full h-full object-contain" />
                                     </button>
                                 ))}
                             </div>
@@ -239,8 +239,17 @@ function ProductDetailPage() {
 
                             <div className="flex items-center space-x-3">
                                 <span className="text-3xl font-bold text-indigo-600">₹{product.discountedPrice}</span>
-                                <span className="text-xl text-slate-400 line-through">₹{product.price}</span>
-                                <span className="bg-red-50 text-red-600 px-2 py-1 rounded-lg text-sm">Save {discountPercentage}%</span>
+                                {
+                                    ((product.discountedPrice == product.price) ? <span></span> :
+                                        <span className="text-xl text-slate-400 line-through">₹{product.price}</span>)
+                                }
+                                {
+                                    (
+                                        (product.price > product.discountedPrice) ?
+                                            <span className="bg-red-50 text-red-600 px-2 py-1 rounded-lg text-sm">Save {discountPercentage}%</span> :
+                                            <span></span>
+                                    )
+                                }
                             </div>
 
                             {/* Colors */}
@@ -446,26 +455,34 @@ function ProductDetailPage() {
                                             <span className="text-sm text-slate-600">{product.reviews.length} reviews</span>
                                         </div>
 
-                                        {/* Rating Distribution */}
                                         <div className="space-y-2">
                                             {[5, 4, 3, 2, 1].map((rating) => {
                                                 const count = product.reviews.filter(review => review.rating === rating).length;
                                                 const percentage = (count / product.reviews.length) * 100;
+
                                                 return (
                                                     <div key={rating} className="flex items-center space-x-2">
                                                         <span className="text-sm text-slate-600">{rating}</span>
-                                                        <Star size={12} className="text-yellow-400 fill-current" />
+
+                                                        {/* ⭐️ Star color depends on whether count > 0 */}
+                                                        <Star
+                                                            size={12}
+                                                            className={count > 0 ? "text-yellow-400 fill-current" : "text-slate-300"}
+                                                        />
+
                                                         <div className="flex-1 bg-slate-200 rounded-full h-2">
                                                             <div
                                                                 className="bg-yellow-400 h-2 rounded-full"
-                                                                style={{ width: `${percentage}%` }}
+                                                                style={{ width: `${count > 0 ? percentage : 0}%` }}
                                                             ></div>
                                                         </div>
+
                                                         <span className="text-sm text-slate-600">{count}</span>
                                                     </div>
                                                 );
                                             })}
                                         </div>
+
                                     </div>
 
                                     {/* Individual Reviews */}

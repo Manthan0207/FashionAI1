@@ -207,7 +207,6 @@ const ProdUpload = () => {
             return;
         }
 
-        // ✅ Passed validation — now disable button
         setIsLoading(true);
 
         try {

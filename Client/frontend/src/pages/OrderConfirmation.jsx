@@ -223,7 +223,7 @@ const OrderConfirmation = () => {
                                             </div>
                                             <div className="flex justify-between text-slate-600">
                                                 <span>Tax (5%)</span>
-                                                <span>₹{userOrder.taxCharge}</span>
+                                                <span>₹{(userOrder.taxCharge).toFixed(2)}</span>
                                             </div>
                                             {userOrder.codConvenienceFee == 0 ? null :
 
