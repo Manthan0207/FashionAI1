@@ -15,7 +15,17 @@ function ProductDetailPage() {
     const { id } = useParams();
     const { user, prods, getSingleProduct, toggleWishlist } = useAuthStore();
     const { cart, addToCart } = useCartStore();
-    const [product, setProduct] = useState(null)
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [tryOnResult, setTryOnResult] = useState(null);
+    const [error, setError] = useState(null);
+    const [selectedSize, setSelectedSize] = useState('M');
+    const [selectedColor, setSelectedColor] = useState('White');
+    const [quantity, setQuantity] = useState(1);
+    const [activeTab, setActiveTab] = useState('description');
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    const [isWishlisted, setIsWishlisted] = useState((user?.wishlist?.includes(product?._id)));
 
     const navigate = useNavigate()
 
@@ -24,6 +34,7 @@ function ProductDetailPage() {
             const prod = await getSingleProduct(id);
             console.log("Fetched Product:", prod);
             setProduct(prod);
+            setSelectedColor(prod.colors[0])
         };
 
         if (id) {
@@ -35,16 +46,7 @@ function ProductDetailPage() {
 
 
 
-    const [loading, setLoading] = useState(false);
-    const [tryOnResult, setTryOnResult] = useState(null);
-    const [error, setError] = useState(null);
-    const [selectedSize, setSelectedSize] = useState('M');
-    const [selectedColor, setSelectedColor] = useState('White');
-    const [quantity, setQuantity] = useState(1);
-    const [activeTab, setActiveTab] = useState('description');
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-    const [isWishlisted, setIsWishlisted] = useState((user?.wishlist?.includes(product?._id)));
     useEffect(() => {
         if (user && product) {
             setIsWishlisted(user.wishlist?.includes(product._id));

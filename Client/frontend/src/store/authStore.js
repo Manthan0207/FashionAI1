@@ -253,7 +253,7 @@ export const useAuthStore = create(
                     set({ isLoading: true, error: null, message: null })
                     try {
                         const response = await axios.patch(`${API_URL}/api/seller/update-product/${id}`, data)
-                        set({ isLoading: false, message: response.data.message, prods: response.data.prods })
+                        set({ isLoading: false, message: response.data.message })
                         return response.data.updated_prod
                     } catch (error) {
                         console.log(error);

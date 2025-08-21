@@ -553,15 +553,7 @@ function AllOrderPage() {
                                         </div>
                                     </div>
 
-                                    {/* Actions */}
-                                    <div className="space-y-2">
-                                        <button className="w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600 transition-colors">
-                                            Track Order
-                                        </button>
-                                        <button className="w-full border border-slate-200 text-slate-700 py-2 rounded-lg hover:bg-slate-50 transition-colors">
-                                            Download Invoice
-                                        </button>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -616,10 +608,7 @@ function AllOrderPage() {
                                     <RefreshCw size={18} />
                                     <span>Refresh</span>
                                 </button>
-                                <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                                    <Download size={18} />
-                                    <span>Export</span>
-                                </button>
+
                             </div>
                         </div>
                     </div>
