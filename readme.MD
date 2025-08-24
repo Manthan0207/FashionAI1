@@ -4,7 +4,7 @@
 
 ### An intelligent e-commerce platform that revolutionizes the online shopping experience with AI-powered virtual try-on and a personal stylist recommendation engine.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Manthan--Panseriya-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/manthan-panseriya-426892215/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Manthan--Panseriya-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/manthan-panseriya-237739338/)
 
 ---
 
@@ -159,6 +159,6 @@ To get a local copy up and running, follow these simple steps.
 
 ## 📬 Contact
 
-Manthan Panseriya - [LinkedIn](https://www.linkedin.com/in/manthan-panseriya-426892215/) - manthanpanseriya0205@gmail.com
+Manthan Panseriya - [LinkedIn](https://www.linkedin.com/in/manthan-panseriya-237739338/) - manthanpanseriya0205@gmail.com
 
 Project Link: [https://github.com/Manthan0207/VestureAI](https://github.com/Manthan0207/VestureAI)
